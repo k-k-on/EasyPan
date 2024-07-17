@@ -27,6 +27,11 @@ public class AppConfig {
     @Value("${admin.emails:}")
     private String adminEmails;
 
+    /**
+     * 获取管理员邮箱信息
+     *
+     * @return String 管理员邮箱
+     */
     public String getAdminEmails() {
         return adminEmails;
     }

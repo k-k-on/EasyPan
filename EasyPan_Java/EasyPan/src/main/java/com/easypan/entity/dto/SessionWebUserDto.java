@@ -1,5 +1,11 @@
 package com.easypan.entity.dto;
 
+/**
+ * 登录的Session信息
+ *
+ * @date 2024/7/17 20:42
+ * @author LiMengYuan
+ */
 public class SessionWebUserDto {
     private String nickName;
     private String userId;

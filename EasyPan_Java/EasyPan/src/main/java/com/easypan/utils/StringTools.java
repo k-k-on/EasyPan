@@ -7,6 +7,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 public class StringTools {
 
+    /**
+     * MD5加密密码
+     *
+     * @param originString 原始未加密密码
+     * @return String 加密后密码
+     */
     public static String encodeByMD5(String originString) {
         return StringTools.isEmpty(originString) ? null : DigestUtils.md5Hex(originString);
     }

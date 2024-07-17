@@ -90,10 +90,12 @@ public class RedisComponent {
         return spaceDto;
     }
 
+
     /**
      * 保存已使用的空间
      *
-     * @param userId
+     * @param userId 用户id
+     * @param userSpaceDto 用户空间dto
      */
     public void saveUserSpaceUse(String userId, UserSpaceDto userSpaceDto) {
         redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);

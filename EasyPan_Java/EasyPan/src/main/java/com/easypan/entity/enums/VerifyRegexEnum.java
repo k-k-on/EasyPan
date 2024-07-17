@@ -1,5 +1,11 @@
 package com.easypan.entity.enums;
 
+/**
+ * 正则对应的枚举类
+ *
+ * @date 2024/7/17 19:09
+ * @author LiMengYuan
+ */
 public enum VerifyRegexEnum {
     NO("", "不校验"),
     IP("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}", "IP地址"),

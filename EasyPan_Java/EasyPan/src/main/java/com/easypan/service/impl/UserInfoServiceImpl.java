@@ -217,26 +217,41 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
 
+    /**
+     * 登录
+     *
+     * @param email 邮箱
+     * @param password 密码
+     * @return SessionWebUserDto
+     * @throws BusinessException 账号或者密码错误 账号已禁用
+     */
     @Override
     public SessionWebUserDto login(String email, String password) {
-        UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+        UserInfo userInfo = this.userInfoMapper.selectByEmail(email);//根据邮箱获取登录信息
         if (null == userInfo || !userInfo.getPassword().equals(password)) {
             throw new BusinessException("账号或者密码错误");
         }
         if (UserStatusEnum.DISABLE.getStatus().equals(userInfo.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
+
+        //更新最后登录时间
         UserInfo updateInfo = new UserInfo();
         updateInfo.setLastLoginTime(new Date());
         this.userInfoMapper.updateByUserId(updateInfo, userInfo.getUserId());
+
+        //保存session信息
         SessionWebUserDto sessionWebUserDto = new SessionWebUserDto();
         sessionWebUserDto.setNickName(userInfo.getNickName());
         sessionWebUserDto.setUserId(userInfo.getUserId());
+
+        //校验是否为超级管理员
         if (ArrayUtils.contains(appConfig.getAdminEmails().split(","), email)) {
             sessionWebUserDto.setAdmin(true);
         } else {
             sessionWebUserDto.setAdmin(false);
         }
+
         //用户空间
         UserSpaceDto userSpaceDto = new UserSpaceDto();
         userSpaceDto.setUseSpace(fileInfoService.getUserUseSpace(userInfo.getUserId()));
@@ -245,19 +260,31 @@ public class UserInfoServiceImpl implements UserInfoService {
         return sessionWebUserDto;
     }
 
+    /**
+     * 注册，添加到uesr_info
+     *
+     * @param email 邮箱
+     * @param nickName 昵称
+     * @param password 密码
+     * @param emailCode 邮箱校验码
+     * @throws BusinessException 邮箱账号已经存在，昵称已经存在
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void register(String email, String nickName, String password, String emailCode) {
-        UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+        UserInfo userInfo = this.userInfoMapper.selectByEmail(email);//判断邮箱是否存在
         if (null != userInfo) {
             throw new BusinessException("邮箱账号已经存在");
         }
-        UserInfo nickNameUser = this.userInfoMapper.selectByNickName(nickName);
+        UserInfo nickNameUser = this.userInfoMapper.selectByNickName(nickName);//判断昵称是否存在
         if (null != nickNameUser) {
             throw new BusinessException("昵称已经存在");
         }
+
         //校验邮箱验证码
         emailCodeService.checkCode(email, emailCode);
+
+        //添加用户到数据库中
         String userId = StringTools.getRandomNumber(Constants.LENGTH_10);
         userInfo = new UserInfo();
         userInfo.setUserId(userId);

@@ -32,8 +32,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
-
-@Component("operationAspect")
+/**
+ * 实现切面
+ *
+ * @date 2024/7/17 19:11
+ * @author LiMengYuan
+ */
+@Component("operationAspect")//交给Spring管理
 @Aspect
 public class GlobalOperationAspect {
 
@@ -48,11 +53,26 @@ public class GlobalOperationAspect {
     @Resource
     private AppConfig appConfig;
 
-
+    /**
+     * 定义注解{@code @GlobalInterceptor}的切点
+     *
+     * @date 2024/7/17 19:11
+     * @author LiMengYuan
+     * @param
+     * @return
+     */
     @Pointcut("@annotation(com.easypan.annotation.GlobalInterceptor)")
     private void requestInterceptor() {
     }
 
+    /**
+     * 定义切点的触发事务
+     *
+     * @date 2024/7/17 19:13
+     * @author LiMengYuan
+     * @param point
+     * @return
+     */
     @Before("requestInterceptor()")
     public void interceptorDo(JoinPoint point) throws BusinessException {
         try {
@@ -65,13 +85,13 @@ public class GlobalOperationAspect {
             if (null == interceptor) {
                 return;
             }
-            /**
+            /*
              * 校验登录
              */
             if (interceptor.checkLogin() || interceptor.checkAdmin()) {
                 checkLogin(interceptor.checkAdmin());
             }
-            /**
+            /*
              * 校验参数
              */
             if (interceptor.checkParams()) {
@@ -161,28 +181,31 @@ public class GlobalOperationAspect {
     /**
      * 校验参数
      *
+     * @date 2024/7/17 19:45
+     * @author LiMengYuan
      * @param value
      * @param verifyParam
+     * @return
      * @throws BusinessException
      */
     private void checkValue(Object value, VerifyParam verifyParam) throws BusinessException {
         Boolean isEmpty = value == null || StringTools.isEmpty(value.toString());
         Integer length = value == null ? 0 : value.toString().length();
 
-        /**
+        /*
          * 校验空
          */
         if (isEmpty && verifyParam.required()) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
 
-        /**
+        /*
          * 校验长度
          */
         if (!isEmpty && (verifyParam.max() != -1 && verifyParam.max() < length || verifyParam.min() != -1 && verifyParam.min() > length)) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
-        /**
+        /*
          * 校验正则
          */
         if (!isEmpty && !StringTools.isEmpty(verifyParam.regex().getRegex()) && !VerifyUtils.verify(verifyParam.regex(), String.valueOf(value))) {

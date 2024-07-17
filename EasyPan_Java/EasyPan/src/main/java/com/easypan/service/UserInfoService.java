@@ -114,9 +114,14 @@ public interface UserInfoService {
      */
     Integer deleteUserInfoByQqOpenId(String qqOpenId);
 
-
+    /**
+     * 登录
+     */
     SessionWebUserDto login(String email, String password);
 
+    /**
+     * 注册
+     */
     void register(String email, String nickName, String password, String emailCode);
 
     void resetPwd(String email, String password, String emailCode);

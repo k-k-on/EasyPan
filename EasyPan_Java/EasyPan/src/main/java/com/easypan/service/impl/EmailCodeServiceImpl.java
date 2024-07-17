@@ -210,6 +210,13 @@ public class EmailCodeServiceImpl implements EmailCodeService {
         emailCodeMapper.insert(emailCode);
     }
 
+    /**
+     * 验证并删除邮箱校验码
+     *
+     * @param email 邮箱
+     * @param code 邮箱验证码
+     * @throws BusinessException 邮箱验证码不正确 邮箱验证码已失效
+     */
     @Override
     public void checkCode(String email, String code) {
         EmailCode emailCode = emailCodeMapper.selectByEmailAndCode(email, code);

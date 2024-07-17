@@ -4,6 +4,12 @@ import org.springframework.web.bind.annotation.Mapping;
 
 import java.lang.annotation.*;
 
+/**
+ * AOP注解定义
+ *
+ * @date 2024/7/17 19:05
+ * @author LiMengYuan
+ */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -18,9 +24,7 @@ public @interface GlobalInterceptor {
     boolean checkLogin() default true;
 
     /**
-     * 校验参数
-     *
-     * @return
+     * 校验参数 默认false
      */
     boolean checkParams() default false;
 
