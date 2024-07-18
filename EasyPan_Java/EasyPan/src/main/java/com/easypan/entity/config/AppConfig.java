@@ -12,7 +12,7 @@ public class AppConfig {
     private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
     /**
-     * 文件目录
+     * 文件根目录
      */
     @Value("${project.folder:}")
     private String projectFolder;
@@ -65,6 +65,11 @@ public class AppConfig {
     private String qqUrlRedirect;
 
 
+    /**
+     * 获取根目录路径
+     *
+     * @return String 根目录路径（后缀为/）
+     */
     public String getProjectFolder() {
         if (!StringTools.isEmpty(projectFolder) && !projectFolder.endsWith("/")) {
             projectFolder = projectFolder + "/";

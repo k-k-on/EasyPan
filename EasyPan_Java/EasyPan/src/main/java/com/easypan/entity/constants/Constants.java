@@ -25,7 +25,11 @@ public class Constants {
 
     public static final String SESSION_SHARE_KEY = "session_share_key_";
 
-    public static final String FILE_FOLDER_FILE = "/file/";
+    //TODO 整理文件目录格式，具体为前后缀"/"的使用
+    /**
+     * 文件放置位置
+     */
+    public static final String FILE_FOLDER_FILE = "file/";
 
     public static final String FILE_FOLDER_TEMP = "/temp/";
 
@@ -41,9 +45,15 @@ public class Constants {
 
     public static final String AVATAR_SUFFIX = ".jpg";
 
+    /**
+     * 头像存储目录
+     */
     public static final String FILE_FOLDER_AVATAR_NAME = "avatar/";
 
-    public static final String AVATAR_DEFUALT = "default_avatar.jpg";
+    /**
+     * 默认头像
+     */
+    public static final String AVATAR_DEFAULT = "default_avatar.jpg";
 
     public static final String VIEW_OBJ_RESULT_KEY = "result";
 

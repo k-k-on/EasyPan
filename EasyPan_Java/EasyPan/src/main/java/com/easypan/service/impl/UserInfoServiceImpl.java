@@ -299,6 +299,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         this.userInfoMapper.insert(userInfo);
     }
 
+    /**
+     * 重置密码
+     *
+     * @param email
+     * @param password
+     * @param emailCode
+     * @throws BusinessException 邮箱账号不存在
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void resetPwd(String email, String password, String emailCode) {

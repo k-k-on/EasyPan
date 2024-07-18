@@ -73,13 +73,17 @@ public class RedisComponent {
 
 
     /**
-     * 获取用户使用的空间
+     * 获取用户已使用空间大小
      *
-     * @param userId
-     * @return
+     * @date 2024/7/18 11:19
+     * @param userId 用户空间
+     * @return UserSpaceDto
+     * @throws
      */
     public UserSpaceDto getUserSpaceUse(String userId) {
+        //获取用户已使用空间大小
         UserSpaceDto spaceDto = (UserSpaceDto) redisUtils.get(Constants.REDIS_KEY_USER_SPACE_USE + userId);
+        //查询用户已使用空间大小
         if (null == spaceDto) {
             spaceDto = new UserSpaceDto();
             Long useSpace = this.fileInfoMapper.selectUseSpace(userId);

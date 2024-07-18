@@ -88,6 +88,12 @@ public class StringTools {
         return content;
     }
 
+    /**
+     * 确认文件路径是否正确，不能包含"../"、"..\\"
+     *
+     * @param path
+     * @return boolean {@code true 正确} {@code false 存在非法字符}
+     */
     public static boolean pathIsOk(String path) {
         if (StringTools.isEmpty(path)) {
             return true;

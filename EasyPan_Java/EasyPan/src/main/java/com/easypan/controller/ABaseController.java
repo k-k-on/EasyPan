@@ -18,18 +18,23 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
+/**
+ * 基础操作，先后端交互以及文件流相关
+ *
+ * @date 2024/7/18 10:11
+ * @author LiMengYuan
+ */
 public class ABaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ABaseController.class);
 
-    protected static final String STATUC_SUCCESS = "success";
+    protected static final String STATUS_SUCCESS = "success";
 
-    protected static final String STATUC_ERROR = "error";
+    protected static final String STATUS_ERROR = "error";
 
     protected <T> ResponseVO getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
-        responseVO.setStatus(STATUC_SUCCESS);
+        responseVO.setStatus(STATUS_SUCCESS);
         responseVO.setCode(ResponseCodeEnum.CODE_200.getCode());
         responseVO.setInfo(ResponseCodeEnum.CODE_200.getMsg());
         responseVO.setData(t);
@@ -46,6 +51,13 @@ public class ABaseController {
         return resultVO;
     }
 
+    /**
+     * 从session中获取用户信息
+     *
+     * @date 2024/7/18 11:15
+     * @param session 网页session
+     * @return SessionWebUserDto 用户信息
+     */
     protected SessionWebUserDto getUserInfoFromSession(HttpSession session) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
         return sessionWebUserDto;
@@ -58,6 +70,14 @@ public class ABaseController {
     }
 
 
+    /**
+     * 读文件流
+     *
+     * @param response
+     * @param filePath
+     * @return
+     * @throws
+     */
     protected void readFile(HttpServletResponse response, String filePath) {
         if (!StringTools.pathIsOk(filePath)) {
             return;
