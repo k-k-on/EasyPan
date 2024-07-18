@@ -335,22 +335,35 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfoMapper.updateByUserId(userInfo, userId);
     }
 
+    /**
+     * QQ登录,通过code获取{@code accessToken}和{@code openId}
+     *
+     * @date 2024/7/18 16:54
+     * @param code
+     * @return SessionWebUserDto
+     * @throws
+     */
     @Override
     public SessionWebUserDto qqLogin(String code) {
+        //step 1：通过回调获取accessToken
         String accessToken = getQQAccessToken(code);
+        //step 2：获取QQ的openId
         String openId = getQQOpenId(accessToken);
+
+        //查询该openId有没有对应的用户信息。有：获取信息登录；无：获取信息注册并登录
         UserInfo user = this.userInfoMapper.selectByQqOpenId(openId);
         String avatar = null;
-        if (null == user) {
+        if (null == user) { //自动注册
+            //step 3：获取QQ的用户信息
             QQInfoDto qqInfo = getQQUserInfo(accessToken, openId);
-            user = new UserInfo();
 
+            user = new UserInfo();
             String nickName = qqInfo.getNickname();
             nickName = nickName.length() > Constants.LENGTH_150 ? nickName.substring(0, 150) : nickName;
             avatar = StringTools.isEmpty(qqInfo.getFigureurl_qq_2()) ? qqInfo.getFigureurl_qq_1() : qqInfo.getFigureurl_qq_2();
             Date curDate = new Date();
 
-            //上传头像到本地
+            //通过QQ用户信息来进行注册
             user.setQqOpenId(openId);
             user.setJoinTime(curDate);
             user.setNickName(nickName);
@@ -362,7 +375,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             user.setTotalSpace(redisComponent.getSysSettingsDto().getUserInitUseSpace() * Constants.MB);
             this.userInfoMapper.insert(user);
             user = userInfoMapper.selectByQqOpenId(openId);
-        } else {
+        } else { //更新对应的用户的登录时间
             UserInfo updateInfo = new UserInfo();
             updateInfo.setLastLoginTime(new Date());
             avatar = user.getQqAvatar();
@@ -371,6 +384,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (UserStatusEnum.DISABLE.getStatus().equals(user.getStatus())) {
             throw new BusinessException("账号被禁用无法登录");
         }
+
+        //设置登录成功的session
         SessionWebUserDto sessionWebUserDto = new SessionWebUserDto();
         sessionWebUserDto.setUserId(user.getUserId());
         sessionWebUserDto.setNickName(user.getNickName());
@@ -388,10 +403,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         return sessionWebUserDto;
     }
 
+    /**
+     * 获取QQ的{@code accessToken}
+     *
+     * @date 2024/7/18 16:57
+     * @param code 返回结果是字符串
+     *             access_token=*&expires_in=7776000&refresh_token=* 返回错误 callback({UcWebConstants.VIEW_OBJ_RESULT_KEY:111,error_description:"error msg"})
+     * @return String QQ的{@code accessToken}
+     * @throws BusinessException 获取qqToken失败
+     */
     private String getQQAccessToken(String code) {
-        /**
-         * 返回结果是字符串 access_token=*&expires_in=7776000&refresh_token=* 返回错误 callback({UcWebConstants.VIEW_OBJ_RESULT_KEY:111,error_description:"error msg"})
-         */
         String accessToken = null;
         String url = null;
         try {
@@ -418,6 +439,14 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
 
+    /**
+     * 获取QQ的{@code openId}
+     *
+     * @date 2024/7/18 17:08
+     * @param accessToken
+     * @return String
+     * @throws BusinessException 调qq接口获取openID失败
+     */
     private String getQQOpenId(String accessToken) throws BusinessException {
         // 获取openId
         String url = String.format(appConfig.getQqUrlOpenId(), accessToken);
@@ -436,6 +465,15 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
 
+    /**
+     * 获取用户信息
+     *
+     * @date 2024/7/18 17:25
+     * @param accessToken
+     * @param qqOpenId
+     * @return QQInfoDto
+     * @throws
+     */
     private QQInfoDto getQQUserInfo(String accessToken, String qqOpenId) throws BusinessException {
         String url = String.format(appConfig.getQqUrlUserInfo(), accessToken, appConfig.getQqAppId(), qqOpenId);
         String response = OKHttpUtils.getRequest(url);

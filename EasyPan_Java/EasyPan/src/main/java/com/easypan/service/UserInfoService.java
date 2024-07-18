@@ -128,6 +128,13 @@ public interface UserInfoService {
 
     void updateUserStatus(String userId, Integer status);
 
+    /**
+     * QQ登录
+     *
+     * @date 2024/7/18 16:53
+     * @param code
+     * @return SessionWebUserDto
+     */
     SessionWebUserDto qqLogin(String code);
 
     void changeUserSpace(String userId, Integer changeSpace);

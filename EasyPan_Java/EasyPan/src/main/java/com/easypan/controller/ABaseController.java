@@ -41,8 +41,18 @@ public class ABaseController {
         return responseVO;
     }
 
+    /**
+     * 简化文件返回对象
+     *
+     * @date 2024/7/18 18:15
+     * @param result
+     * @param classz
+     * @return PaginationResultVO<T>
+     * @throws
+     */
     protected <S, T> PaginationResultVO<T> convert2PaginationVO(PaginationResultVO<S> result, Class<T> classz) {
         PaginationResultVO<T> resultVO = new PaginationResultVO<>();
+        //将FileInfo的list对象转换为FileInfoVO的list对象
         resultVO.setList(CopyTools.copyList(result.getList(), classz));
         resultVO.setPageNo(result.getPageNo());
         resultVO.setPageSize(result.getPageSize());

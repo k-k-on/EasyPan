@@ -1,6 +1,11 @@
 package com.easypan.entity.enums;
 
-
+/**
+ * 文件类型FileCategory对应的枚举类
+ *
+ * @date 2024/7/18 18:07
+ * @author LiMengYuan
+ */
 public enum FileCategoryEnums {
     VIDEO(1, "video", "视频"),
     MUSIC(2, "music", "音频"),

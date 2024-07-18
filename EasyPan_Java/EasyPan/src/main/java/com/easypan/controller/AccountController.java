@@ -15,6 +15,7 @@ import com.easypan.exception.BusinessException;
 import com.easypan.service.EmailCodeService;
 import com.easypan.service.UserInfoService;
 
+import com.easypan.utils.StringTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,19 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * 请求地址：{@code http://easypan.lmycoding.com}
+ * <br/>
+ * 账号 Controller
+ *
+ * @date 2024/7/18 18:01
+ * @author LiMengYuan
+ */
 @RestController("accountController")
 //@RequestMapping("userInfo")
 public class AccountController extends ABaseController {
@@ -55,9 +68,9 @@ public class AccountController extends ABaseController {
 
     /**
      * 接口：/checkCode?type=0
-     * <p/>
+     * <br/>
      * 请求参数：type
-     * <p/>
+     * <br/>
      *
      * @param response
      * @param session
@@ -86,9 +99,9 @@ public class AccountController extends ABaseController {
 
     /**
      * 接口：/sendEmailCode
-     * <p/>
+     * <br/>
      * 请求参数：<li/>email<li/>checkCode<li/>type
-     * <p/>
+     * <br/>
      * 发送邮箱验证码
      *
      * @param session
@@ -99,7 +112,7 @@ public class AccountController extends ABaseController {
      * @throws
      */
     @RequestMapping("/sendEmailCode")
-    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public ResponseVO sendEmailCode(HttpSession session,
                                     @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                     @VerifyParam(required = true) String checkCode,
@@ -132,7 +145,7 @@ public class AccountController extends ABaseController {
      * @throws
      */
     @RequestMapping("/register")
-    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public ResponseVO register(HttpSession session,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                @VerifyParam(required = true, max = 20) String nickName,
@@ -166,7 +179,7 @@ public class AccountController extends ABaseController {
      * @throws BusinessException 图片验证码不正确
      */
     @RequestMapping("/login")
-    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public ResponseVO login(HttpSession session, HttpServletRequest request,
                             @VerifyParam(required = true) String email,
                             @VerifyParam(required = true) String password,
@@ -199,7 +212,7 @@ public class AccountController extends ABaseController {
      * @throws
      */
     @RequestMapping("/resetPwd")
-    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public ResponseVO resetPwd(HttpSession session,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
                                @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD, min = 8, max = 18) String password,
@@ -229,7 +242,7 @@ public class AccountController extends ABaseController {
      * @throws
      */
     @RequestMapping("/getAvatar/{userId}")
-    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public void getAvatar(HttpServletResponse response,
                           @VerifyParam(required = true) @PathVariable("userId") String userId) {
         String avatarFolderName = Constants.FILE_FOLDER_FILE + Constants.FILE_FOLDER_AVATAR_NAME;
@@ -366,13 +379,64 @@ public class AccountController extends ABaseController {
             logger.error("上传头像失败", e);
         }
 
-        //更新用户id对应的头像，更新mysql数据库。如果qq头像存在
+        //更新用户id对应的头像，更新mysql数据库。如果本地存在用户头像，则显示本地头像，否则显示qq头像，都不存在则显示默认头像
         UserInfo userInfo = new UserInfo();
         userInfo.setQqAvatar("");
         userInfoService.updateUserInfoByUserId(userInfo, webUserDto.getUserId());
         webUserDto.setAvatar(null);
         session.setAttribute(Constants.SESSION_KEY, webUserDto);
         return getSuccessResponseVO(null);
+    }
+
+    /**
+     * 接口：/qqlogin
+     * <br/>
+     * 请求参数：callbackUrl
+     * <br/>
+     * QQ登录
+     *
+     * @date 2024/7/18 16:18
+     * @param session
+     * @param callbackUrl 登录成功后回调地址
+     * @return ResponseVO
+     * @throws UnsupportedEncodingException
+     */
+    @RequestMapping("/qqlogin")
+    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    public ResponseVO qqlogin(HttpSession session, String callbackUrl) throws UnsupportedEncodingException {
+        String state = StringTools.getRandomString(Constants.LENGTH_30);
+        if (!StringTools.isEmpty(callbackUrl)) {
+            session.setAttribute(state, callbackUrl);
+        }
+        String url = String.format(appConfig.getQqUrlAuthorization(), appConfig.getQqAppId(), URLEncoder.encode(appConfig.getQqUrlRedirect(), "utf-8"), state);
+        return getSuccessResponseVO(url);
+    }
+
+    /**
+     * 接口：/qqlogin/callback
+     * <br/>
+     * 请求参数：code state
+     * <br/>
+     * QQ登录回调
+     *
+     * @date 2024/7/18 16:28
+     * @param session
+     * @param code qq官方回调的code
+     * @param state 获取登录信息后端传入的状态码
+     * @return ResponseVO
+     * @throws
+     */
+    @RequestMapping("/qqlogin/callback")
+    @GlobalInterceptor(checkLogin = false, checkParams = true)
+    public ResponseVO qqLoginCallback(HttpSession session,
+                                      @VerifyParam(required = true) String code,
+                                      @VerifyParam(required = true) String state) {
+        SessionWebUserDto sessionWebUserDto = userInfoService.qqLogin(code);
+        session.setAttribute(Constants.SESSION_KEY, sessionWebUserDto);
+        Map<String, Object> result = new HashMap<> ();
+        result.put("callbackUrl", session.getAttribute(state));
+        result.put("userInfo", sessionWebUserDto);
+        return getSuccessResponseVO(result);
     }
 
 }

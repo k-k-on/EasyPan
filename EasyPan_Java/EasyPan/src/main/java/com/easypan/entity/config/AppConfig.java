@@ -40,20 +40,20 @@ public class AppConfig {
     private Boolean dev;
 
 
+    /**
+     * QQ登录相关配置
+     */
     @Value("${qq.app.id:}")
     private String qqAppId;
 
     @Value("${qq.app.key:}")
     private String qqAppKey;
 
-
     @Value("${qq.url.authorization:}")
     private String qqUrlAuthorization;
 
-
     @Value("${qq.url.access.token:}")
     private String qqUrlAccessToken;
-
 
     @Value("${qq.url.openid:}")
     private String qqUrlOpenId;

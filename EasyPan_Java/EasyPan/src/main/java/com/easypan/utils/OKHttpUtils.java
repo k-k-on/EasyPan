@@ -14,6 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 发送http请求
+ *
+ * @date 2024/7/18 17:04
+ * @author LiMengYuan
+ */
 public class OKHttpUtils {
     /**
      * 请求超时时间5秒

@@ -8,6 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * 对发送json的简单封装
+ *
+ * @date 2024/7/18 17:08
+ * @author LiMengYuan
+ */
 public class JsonUtils {
     private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 

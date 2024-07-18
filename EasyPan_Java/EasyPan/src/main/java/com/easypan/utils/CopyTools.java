@@ -5,6 +5,12 @@ import org.springframework.beans.BeanUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 封装copy方法，将一个对象copy为另外一个对象
+ *
+ * @date 2024/7/18 18:16
+ * @author LiMengYuan
+ */
 public class CopyTools {
     public static <T, S> List<T> copyList(List<S> sList, Class<T> classz) {
         List<T> list = new ArrayList<T>();

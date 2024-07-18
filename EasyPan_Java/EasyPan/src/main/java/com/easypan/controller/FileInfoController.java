@@ -25,26 +25,42 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
+ * 请求地址：{@code http://easypan.lmycoding.com/file}
+ * <br/>
  * 文件信息 Controller
+ *
+ * @date 2024/7/18 18:01
+ * @author LiMengYuan
  */
 @RestController("fileInfoController")
 @RequestMapping("/file")
 public class FileInfoController extends CommonFileController {
 
     /**
-     * 根据条件分页查询
+     * 接口：/loadDataList
+     * <br/>
+     * 请求参数：category filePid fileNameFuzzy pageNo pageSize
+     * <br/>
+     * 根据条件分页查询文件列表
+     *
+     * @date 2024/7/18 18:09
+     * @param session
+     * @param query 文件信息
+     * @param category 分类
+     * @return ResponseVO
+     * @throws
      */
     @RequestMapping("/loadDataList")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO loadDataList(HttpSession session, FileInfoQuery query, String category) {
-        FileCategoryEnums categoryEnum = FileCategoryEnums.getByCode(category);
-        if (null != categoryEnum) {
-            query.setFileCategory(categoryEnum.getCategory());
+        FileCategoryEnums fileCategory = FileCategoryEnums.getByCode(category);
+        if (null != fileCategory) {
+            query.setFileCategory(fileCategory.getCategory());
         }
         query.setUserId(getUserInfoFromSession(session).getUserId());
         query.setOrderBy("last_update_time desc");
         query.setDelFlag(FileDelFlagEnums.USING.getFlag());
-        PaginationResultVO result = fileInfoService.findListByPage(query);
+        PaginationResultVO<FileInfo> result = fileInfoService.findListByPage(query);
         return getSuccessResponseVO(convert2PaginationVO(result, FileInfoVO.class));
     }
 

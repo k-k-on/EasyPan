@@ -85,15 +85,13 @@ public class GlobalOperationAspect {
             if (null == interceptor) {
                 return;
             }
-            /*
-             * 校验登录
-             */
+
+            //定义了校验登录或校验管理员时
             if (interceptor.checkLogin() || interceptor.checkAdmin()) {
                 checkLogin(interceptor.checkAdmin());
             }
-            /*
-             * 校验参数
-             */
+
+            //定义了校验参数时
             if (interceptor.checkParams()) {
                 validateParams(method, arguments);
             }
@@ -110,8 +108,16 @@ public class GlobalOperationAspect {
     }
 
 
-    //校验登录
+    /**
+     * 校验登录
+     *
+     * @date 2024/7/18 15:52
+     * @param checkAdmin
+     * @return
+     * @throws BusinessException 登录超时，请重新登录
+     */
     private void checkLogin(Boolean checkAdmin) {
+        //全局的变量信息，可以直接获取request请求
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpSession session = request.getSession();
         SessionWebUserDto sessionUser = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
