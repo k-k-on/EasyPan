@@ -606,6 +606,8 @@
         <include refid="base_column_list"/>
         from user_info where qq_open_id=#{qqOpenId}
     </select>
+
+    <!-- 更新用户空间 -->
     <update id="updateUserSpace">
         update user_info
         <set>

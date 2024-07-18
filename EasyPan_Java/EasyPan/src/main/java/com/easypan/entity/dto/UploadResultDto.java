@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 
+/**
+ * 文件上传状态 dto
+ *
+ * @date 2024/7/18 19:52
+ * @author LiMengYuan
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UploadResultDto implements Serializable {
     private String fileId;

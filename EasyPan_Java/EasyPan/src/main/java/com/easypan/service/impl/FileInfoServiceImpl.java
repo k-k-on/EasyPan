@@ -159,6 +159,21 @@ public class FileInfoServiceImpl implements FileInfoService {
     }
 
 
+    /**
+     * 文件上传方法
+     *
+     * @date 2024/7/18 19:50
+     * @param webUserDto
+     * @param fileId 文件ID
+     * @param file 文件流
+     * @param fileName 文件名
+     * @param filePid 文件父id
+     * @param fileMd5 文件MD5值
+     * @param chunkIndex 当前分片索引
+     * @param chunks 总分片数
+     * @return UploadResultDto
+     * @throws
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5,
@@ -167,11 +182,15 @@ public class FileInfoServiceImpl implements FileInfoService {
         Boolean uploadSuccess = true;
         try {
             UploadResultDto resultDto = new UploadResultDto();
+
+            //获取fileId
             if (StringTools.isEmpty(fileId)) {
                 fileId = StringTools.getRandomString(Constants.LENGTH_10);
             }
             resultDto.setFileId(fileId);
             Date curDate = new Date();
+
+            //获取UserSpaceDto，用户已使用空间
             UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
             if (chunkIndex == 0) {
                 FileInfoQuery infoQuery = new FileInfoQuery();
@@ -179,42 +198,51 @@ public class FileInfoServiceImpl implements FileInfoService {
                 infoQuery.setSimplePage(new SimplePage(0, 1));
                 infoQuery.setStatus(FileStatusEnums.USING.getStatus());
                 List<FileInfo> dbFileList = this.fileInfoMapper.selectList(infoQuery);
-                //秒传
+
+                //该文件对应的md5已存在，秒传
                 if (!dbFileList.isEmpty()) {
                     FileInfo dbFile = dbFileList.get(0);
-                    //判断文件状态
+
+                    //判断用户空间是否足够上传
                     if (dbFile.getFileSize() + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
                         throw new BusinessException (ResponseCodeEnum.CODE_904);
                     }
+
                     dbFile.setFileId(fileId);
                     dbFile.setFilePid(filePid);
                     dbFile.setUserId(webUserDto.getUserId());
-                    dbFile.setFileMd5(null);
+                    //dbFile.setFileMd5(null);
                     dbFile.setCreateTime(curDate);
                     dbFile.setLastUpdateTime(curDate);
                     dbFile.setStatus(FileStatusEnums.USING.getStatus());
                     dbFile.setDelFlag(FileDelFlagEnums.USING.getFlag());
                     dbFile.setFileMd5(fileMd5);
+
+                    //文件重命名
                     fileName = autoRename(filePid, webUserDto.getUserId(), fileName);
                     dbFile.setFileName(fileName);
                     this.fileInfoMapper.insert(dbFile);
                     resultDto.setStatus(UploadStatusEnums.UPLOAD_SECONDS.getCode());
-                    //更新用户空间使用
+
+                    //更新用户已使用空间
                     updateUserSpace(webUserDto, dbFile.getFileSize());
 
                     return resultDto;
                 }
             }
+
+            /*分片上传*/
             //暂存在临时目录
             String tempFolderName = appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP;
             String currentUserFolderName = webUserDto.getUserId() + fileId;
+
             //创建临时目录
             tempFileFolder = new File(tempFolderName + currentUserFolderName);
             if (!tempFileFolder.exists()) {
                 tempFileFolder.mkdirs();
             }
 
-            //判断磁盘空间
+            //判断网盘空间是否足够
             Long currentTempSize = redisComponent.getFileTempSize(webUserDto.getUserId(), fileId);
             if (file.getSize() + currentTempSize + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
                 throw new BusinessException(ResponseCodeEnum.CODE_904);
@@ -285,6 +313,15 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 更新用户已使用空间大小
+     *
+     * @date 2024/7/18 20:28
+     * @param webUserDto
+     * @param totalSize
+     * @return
+     * @throws BusinessException 网盘空间不足，请扩容
+     */
     private void updateUserSpace(SessionWebUserDto webUserDto, Long totalSize) {
         Integer count = userInfoMapper.updateUserSpace(webUserDto.getUserId(), totalSize, null);
         if (count == 0) {
@@ -295,6 +332,15 @@ public class FileInfoServiceImpl implements FileInfoService {
         redisComponent.saveUserSpaceUse(webUserDto.getUserId(), spaceDto);
     }
 
+    /**
+     * 文件自动重命名
+     *
+     * @date 2024/7/18 20:17
+     * @param filePid
+     * @param userId
+     * @param fileName
+     * @return String
+     */
     private String autoRename(String filePid, String userId, String fileName) {
         FileInfoQuery fileInfoQuery = new FileInfoQuery();
         fileInfoQuery.setUserId(userId);
@@ -303,6 +349,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         fileInfoQuery.setFileName(fileName);
         Integer count = this.fileInfoMapper.selectCount(fileInfoQuery);
         if (count > 0) {
+            //TODO 修改 重命名逻辑，应该检查是否存在与新生成的名称一样的文件名
             return StringTools.rename(fileName);
         }
 

@@ -64,6 +64,25 @@ public class FileInfoController extends CommonFileController {
         return getSuccessResponseVO(convert2PaginationVO(result, FileInfoVO.class));
     }
 
+    /**
+     * 接口：/uploadFile
+     * <br/>
+     * 请求参数：fileId file fileName filePid fileMd5 chunkIndex chunks
+     * <br/>
+     * 文件分片上传
+     *
+     * @date 2024/7/18 19:47
+     * @param session
+     * @param fileId 文件ID
+     * @param file 文件流
+     * @param fileName 文件名
+     * @param filePid 文件父id
+     * @param fileMd5 文件MD5值
+     * @param chunkIndex 当前分片索引
+     * @param chunks 总分片数
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/uploadFile")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO uploadFile(HttpSession session,

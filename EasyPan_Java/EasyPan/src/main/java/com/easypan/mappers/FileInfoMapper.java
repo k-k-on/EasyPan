@@ -7,6 +7,9 @@ import java.util.List;
 
 /**
  * 文件信息 数据库操作接口
+ *
+ * @date 2024/7/18 19:55
+ * @author LiMengYuan
  */
 public interface FileInfoMapper<T, P> extends BaseMapper<T, P> {
 

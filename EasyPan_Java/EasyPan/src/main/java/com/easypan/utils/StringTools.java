@@ -46,6 +46,13 @@ public class StringTools {
         return fileName;
     }
 
+    /**
+     * 重命名
+     *
+     * @date 2024/7/18 20:25
+     * @param fileName
+     * @return String
+     */
     public static String rename(String fileName) {
         String fileNameReal = getFileNameNoSuffix(fileName);
         String suffix = getFileSuffix(fileName);

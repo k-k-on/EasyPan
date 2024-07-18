@@ -290,24 +290,6 @@ public class AccountController extends ABaseController {
         }
     }
 
-    /**
-     * 接口：/getUserInfo
-     * <br/>
-     * 请求参数：
-     * <br/>
-     * 获取用户信息
-     *
-     * @date 2024/7/18 11:13
-     * @param session
-     * @return ResponseVO
-     * @throws
-     */
-    @RequestMapping("/getUserInfo")
-    @GlobalInterceptor
-    public ResponseVO getUserInfo(HttpSession session) {
-        SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
-        return getSuccessResponseVO(sessionWebUserDto);
-    }
 
     /**
      * 接口：/getUseSpace
@@ -385,6 +367,31 @@ public class AccountController extends ABaseController {
         userInfoService.updateUserInfoByUserId(userInfo, webUserDto.getUserId());
         webUserDto.setAvatar(null);
         session.setAttribute(Constants.SESSION_KEY, webUserDto);
+        return getSuccessResponseVO(null);
+    }
+
+    /**
+     * 接口：/updatePassword
+     * <br/>
+     * 请求参数：password
+     * <br/>
+     * 修改密码
+     *
+     * @date 2024/7/18 19:41
+     * @param session
+     * @param password 密码 只能是数字，字母，特殊字符 8-18位
+     * @return ResponseVO
+     * @throws
+     */
+    @RequestMapping("/updatePassword")
+    @GlobalInterceptor(checkParams = true)
+    public ResponseVO updatePassword(HttpSession session,
+                                     @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD, min = 8, max = 18) String password) {
+        //TODO 修改 修改密码的逻辑，需要输入当前密码进行验证（前后端都需要更改）
+        SessionWebUserDto sessionWebUserDto = getUserInfoFromSession(session);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setPassword(StringTools.encodeByMD5(password));
+        userInfoService.updateUserInfoByUserId(userInfo, sessionWebUserDto.getUserId());
         return getSuccessResponseVO(null);
     }
 

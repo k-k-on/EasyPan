@@ -116,17 +116,44 @@ public class RedisComponent {
         return spaceDto;
     }
 
-    //保存文件临时大小
+    /**
+     * 保存文件临时大小
+     *
+     * @date 2024/7/18 20:41
+     * @param userId
+     * @param fileId
+     * @param fileSize
+     * @return
+     * @throws
+     */
     public void saveFileTempSize(String userId, String fileId, Long fileSize) {
         Long currentSize = getFileTempSize(userId, fileId);
+        //TODO 修改redis逻辑，文件上传的redis信息不应该设置失效时间，可以检测上传完成后进行自动销毁
         redisUtils.setex(Constants.REDIS_KEY_USER_FILE_TEMP_SIZE + userId + fileId, currentSize + fileSize, Constants.REDIS_KEY_EXPIRES_ONE_HOUR);
     }
 
+    /**
+     * 获取临时文件大小
+     *
+     * @date 2024/7/18 20:40
+     * @param userId
+     * @param fileId
+     * @return Long
+     * @throws
+     */
     public Long getFileTempSize(String userId, String fileId) {
         Long currentSize = getFileSizeFromRedis(Constants.REDIS_KEY_USER_FILE_TEMP_SIZE + userId + fileId);
         return currentSize;
     }
 
+    /**
+     * 从redis中读取文件大小
+     *
+     * @date 2024/7/18 20:39
+     * @param key
+     * @return Long
+     * @throws
+     */
     private Long getFileSizeFromRedis(String key) {
         Object sizeObj = redisUtils.get(key);
         if (sizeObj == null) {
