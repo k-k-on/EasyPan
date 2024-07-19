@@ -59,6 +59,14 @@ public class StringTools {
         return fileNameReal + "_" + getRandomString(Constants.LENGTH_5) + suffix;
     }
 
+    /**
+     * 生成随机字符串
+     *
+     * @date 2024/7/19 9:50
+     * @param count
+     * @return String
+     * @throws
+     */
     public static final String getRandomString(Integer count) {
         return RandomStringUtils.random(count, true, true);
     }

@@ -9,10 +9,27 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.math.BigDecimal;
 
+/**
+ * ffmpeg方法类
+ *
+ * @date 2024/7/19 11:32
+ * @author LiMengYuan
+ */
 public class ScaleFilter {
     private static final Logger logger = LoggerFactory.getLogger(ScaleFilter.class);
 
 
+    /**
+     * 通过图片生成缩略图
+     *
+     * @date 2024/7/19 11:34
+     * @param file
+     * @param thumbnailWidth
+     * @param targetFile
+     * @param delSource
+     * @return Boolean
+     * @throws
+     */
     public static Boolean createThumbnailWidthFFmpeg(File file, int thumbnailWidth, File targetFile, Boolean delSource) {
         try {
             BufferedImage src = ImageIO.read(file);
@@ -31,6 +48,16 @@ public class ScaleFilter {
         return false;
     }
 
+    /**
+     * 压缩图片
+     *
+     * @date 2024/7/19 11:36
+     * @param sourceFile
+     * @param widthPercentage
+     * @param targetFile
+     * @return
+     * @throws
+     */
     public static void compressImageWidthPercentage(File sourceFile, BigDecimal widthPercentage, File targetFile) {
         try {
             BigDecimal widthResult = widthPercentage.multiply(new BigDecimal(ImageIO.read(sourceFile).getWidth()));
@@ -40,6 +67,16 @@ public class ScaleFilter {
         }
     }
 
+    /**
+     * 通过视频生成缩略图
+     *
+     * @date 2024/7/19 11:33
+     * @param sourceFile
+     * @param width
+     * @param targetFile
+     * @return
+     * @throws
+     */
     public static void createCover4Video(File sourceFile, Integer width, File targetFile) {
         try {
             String cmd = "ffmpeg -i %s -y -vframes 1 -vf scale=%d:%d/a %s";

@@ -73,46 +73,91 @@ public class FileInfoController extends CommonFileController {
      *
      * @date 2024/7/18 19:47
      * @param session
-     * @param fileId 文件ID
-     * @param file 文件流
-     * @param fileName 文件名
-     * @param filePid 文件父id
-     * @param fileMd5 文件MD5值
-     * @param chunkIndex 当前分片索引
-     * @param chunks 总分片数
+     * @param fileId        文件ID
+     * @param file          文件流
+     * @param fileName      文件名
+     * @param filePid       文件父id
+     * @param fileMd5       文件MD5值
+     * @param chunkIndex    当前分片索引
+     * @param chunks        总分片数
+     * @param fileSize      文件大小
      * @return ResponseVO
-     * @throws
      */
     @RequestMapping("/uploadFile")
     @GlobalInterceptor(checkParams = true)
-    public ResponseVO uploadFile(HttpSession session,
-                                 String fileId,
-                                 MultipartFile file,
+    public ResponseVO uploadFile(HttpSession session, String fileId, MultipartFile file,
                                  @VerifyParam(required = true) String fileName,
                                  @VerifyParam(required = true) String filePid,
                                  @VerifyParam(required = true) String fileMd5,
                                  @VerifyParam(required = true) Integer chunkIndex,
-                                 @VerifyParam(required = true) Integer chunks) {
+                                 @VerifyParam(required = true) Integer chunks,
+                                 @VerifyParam(required = true) Integer fileSize) {
 
         SessionWebUserDto webUserDto = getUserInfoFromSession(session);
-        UploadResultDto resultDto = fileInfoService.uploadFile(webUserDto, fileId, file, fileName, filePid, fileMd5, chunkIndex, chunks);
+        UploadResultDto resultDto = fileInfoService.uploadFile(webUserDto, fileId, file, fileName, filePid, fileMd5, chunkIndex, chunks, fileSize);
         return getSuccessResponseVO(resultDto);
     }
 
 
+    /**
+     * 接口：/getImage/{imageFolder}/{imageName}
+     * <br/>
+     * 请求参数：
+     * <br/>
+     * 显示封面
+     *
+     * @date 2024/7/19 11:42
+     * @param response
+     * @param imageFolder
+     * @param imageName
+     * @return
+     * @throws
+     */
     @RequestMapping("/getImage/{imageFolder}/{imageName}")
-    public void getImage(HttpServletResponse response, @PathVariable("imageFolder") String imageFolder, @PathVariable("imageName") String imageName) {
+    public void getImage(HttpServletResponse response,
+                         @PathVariable("imageFolder") String imageFolder,
+                         @PathVariable("imageName") String imageName) {
         super.getImage(response, imageFolder, imageName);
     }
 
+    /**
+     * 接口：/ts/getVideoInfo/{fileId}
+     * <br/>
+     * 请求参数：
+     * <br/>
+     * 获取视频文件信息
+     *
+     * @date 2024/7/19 11:50
+     * @param response
+     * @param session
+     * @param fileId
+     * @return
+     * @throws
+     */
     @RequestMapping("/ts/getVideoInfo/{fileId}")
-    public void getVideoInfo(HttpServletResponse response, HttpSession session, @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
+    public void getVideoInfo(HttpServletResponse response, HttpSession session,
+                             @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
         SessionWebUserDto webUserDto = getUserInfoFromSession(session);
         super.getFile(response, fileId, webUserDto.getUserId());
     }
 
+    /**
+     * 接口：/getFile/{fileId}
+     * <br/>
+     * 请求参数：
+     * <br/>
+     * 获取文件信息
+     *
+     * @date 2024/7/19 15:50
+     * @param response
+     * @param session
+     * @param fileId
+     * @return
+     * @throws
+     */
     @RequestMapping("/getFile/{fileId}")
-    public void getFile(HttpServletResponse response, HttpSession session, @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
+    public void getFile(HttpServletResponse response, HttpSession session,
+                        @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
         SessionWebUserDto webUserDto = getUserInfoFromSession(session);
         super.getFile(response, fileId, webUserDto.getUserId());
     }

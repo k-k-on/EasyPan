@@ -162,25 +162,28 @@ public class FileInfoServiceImpl implements FileInfoService {
     /**
      * 文件上传方法
      *
-     * @date 2024/7/18 19:50
      * @param webUserDto
-     * @param fileId 文件ID
-     * @param file 文件流
-     * @param fileName 文件名
-     * @param filePid 文件父id
-     * @param fileMd5 文件MD5值
+     * @param fileId     文件ID
+     * @param file       文件流
+     * @param fileName   文件名
+     * @param filePid    文件父id
+     * @param fileMd5    文件MD5值
      * @param chunkIndex 当前分片索引
-     * @param chunks 总分片数
+     * @param chunks     总分片数
+     * @param fileSize   文件大小
      * @return UploadResultDto
      * @throws
+     * @date 2024/7/18 19:50
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5,
-                                      Integer chunkIndex, Integer chunks) {
+                                      Integer chunkIndex, Integer chunks, Integer fileSize) {
+        //TODO 修改文件上传逻辑：判断文件空间容量的逻辑
         File tempFileFolder = null;
-        Boolean uploadSuccess = true;
+        boolean uploadSuccess = true;
         try {
+
             UploadResultDto resultDto = new UploadResultDto();
 
             //获取fileId
@@ -192,6 +195,12 @@ public class FileInfoServiceImpl implements FileInfoService {
 
             //获取UserSpaceDto，用户已使用空间
             UserSpaceDto spaceDto = redisComponent.getUserSpaceUse(webUserDto.getUserId());
+
+            //检查空间是否足够
+            if(fileSize  + spaceDto.getUseSpace () > spaceDto.getTotalSpace ()) {
+                throw new BusinessException (ResponseCodeEnum.CODE_904);//网盘空间不足，请扩容
+            }
+
             if (chunkIndex == 0) {
                 FileInfoQuery infoQuery = new FileInfoQuery();
                 infoQuery.setFileMd5(fileMd5);
@@ -205,7 +214,7 @@ public class FileInfoServiceImpl implements FileInfoService {
 
                     //判断用户空间是否足够上传
                     if (dbFile.getFileSize() + spaceDto.getUseSpace() > spaceDto.getTotalSpace()) {
-                        throw new BusinessException (ResponseCodeEnum.CODE_904);
+                        throw new BusinessException (ResponseCodeEnum.CODE_904);//网盘空间不足，请扩容
                     }
 
                     dbFile.setFileId(fileId);
@@ -250,7 +259,7 @@ public class FileInfoServiceImpl implements FileInfoService {
 
             File newFile = new File(tempFileFolder.getPath() + "/" + chunkIndex);
             file.transferTo(newFile);
-            //保存临时大小
+            //保存临时文件大小
             redisComponent.saveFileTempSize(webUserDto.getUserId(), fileId, file.getSize());
             //不是最后一个分片，直接返回
             if (chunkIndex < chunks - 1) {
@@ -265,6 +274,7 @@ public class FileInfoServiceImpl implements FileInfoService {
             FileTypeEnums fileTypeEnum = FileTypeEnums.getFileTypeBySuffix(fileSuffix);
             //自动重命名
             fileName = autoRename(filePid, webUserDto.getUserId(), fileName);
+            //存储文件信息到数据库
             FileInfo fileInfo = new FileInfo();
             fileInfo.setFileId(fileId);
             fileInfo.setUserId(webUserDto.getUserId());
@@ -281,6 +291,7 @@ public class FileInfoServiceImpl implements FileInfoService {
             fileInfo.setDelFlag(FileDelFlagEnums.USING.getFlag());
             this.fileInfoMapper.insert(fileInfo);
 
+            //获取文件总大小
             Long totalSize = redisComponent.getFileTempSize(webUserDto.getUserId(), fileId);
             updateUserSpace(webUserDto, totalSize);
 
@@ -307,7 +318,7 @@ public class FileInfoServiceImpl implements FileInfoService {
                 try {
                     FileUtils.deleteDirectory(tempFileFolder);
                 } catch (IOException e) {
-                    logger.error("删除临时目录失败");
+                    logger.error("删除临时目录失败", e);
                 }
             }
         }
@@ -336,9 +347,9 @@ public class FileInfoServiceImpl implements FileInfoService {
      * 文件自动重命名
      *
      * @date 2024/7/18 20:17
-     * @param filePid
+     * @param filePid   文件父id
      * @param userId
-     * @param fileName
+     * @param fileName  文件名
      * @return String
      */
     private String autoRename(String filePid, String userId, String fileName) {
@@ -356,6 +367,15 @@ public class FileInfoServiceImpl implements FileInfoService {
         return fileName;
     }
 
+    /**
+     * 文件转码
+     *
+     * @date 2024/7/19 10:11
+     * @param fileId        文件ID
+     * @param webUserDto
+     * @return
+     * @throws
+     */
     @Async
     public void transferFile(String fileId, SessionWebUserDto webUserDto) {
         Boolean transferSuccess = true;
@@ -389,20 +409,21 @@ public class FileInfoServiceImpl implements FileInfoService {
             targetFilePath = targetFolder.getPath() + "/" + realFileName;
             //合并文件
             union(fileFolder.getPath(), targetFilePath, fileInfo.getFileName(), true);
-            //视频文件切割
+
+            //生成缩略图
             fileTypeEnum = FileTypeEnums.getFileTypeBySuffix(fileSuffix);
             if (FileTypeEnums.VIDEO == fileTypeEnum) {
                 cutFile4Video(fileId, targetFilePath);
-                //视频生成缩略图
+                //视频生成缩略图,视频文件切割
                 cover = month + "/" + currentUserFolderName + Constants.IMAGE_PNG_SUFFIX;
                 String coverPath = targetFolderName + "/" + cover;
                 ScaleFilter.createCover4Video(new File(targetFilePath), Constants.LENGTH_150, new File(coverPath));
             } else if (FileTypeEnums.IMAGE == fileTypeEnum) {
-                //生成缩略图
+                //图片生成缩略图
                 cover = month + "/" + realFileName.replace(".", "_.");
                 String coverPath = targetFolderName + "/" + cover;
                 Boolean created = ScaleFilter.createThumbnailWidthFFmpeg(new File(targetFilePath), Constants.LENGTH_150, new File(coverPath), false);
-                if (!created) {
+                if (!created) {//图片太小无法生成缩略图时，就copy原图作为缩略图
                     FileUtils.copyFile(new File(targetFilePath), new File(coverPath));
                 }
             }
@@ -418,12 +439,23 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 合并文件
+     *
+     * @date 2024/7/19 11:10
+     * @param dirPath
+     * @param toFilePath
+     * @param fileName
+     * @param delSource
+     * @return
+     * @throws BusinessException 目录不存在
+     */
     public static void union(String dirPath, String toFilePath, String fileName, boolean delSource) throws BusinessException {
         File dir = new File(dirPath);
         if (!dir.exists()) {
             throw new BusinessException("目录不存在");
         }
-        File fileList[] = dir.listFiles();
+        File[] fileList = dir.listFiles();
         File targetFile = new File(toFilePath);
         RandomAccessFile writeFile = null;
         try {
@@ -469,22 +501,36 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 视频切割
+     *
+     * @date 2024/7/19 11:23
+     * @param fileId            文件ID
+     * @param videoFilePath
+     * @return
+     * @throws
+     */
     private void cutFile4Video(String fileId, String videoFilePath) {
         //创建同名切片目录
         File tsFolder = new File(videoFilePath.substring(0, videoFilePath.lastIndexOf(".")));
         if (!tsFolder.exists()) {
             tsFolder.mkdirs();
         }
-        final String CMD_TRANSFER_2TS = "ffmpeg -y -i %s  -vcodec copy -acodec copy -vbsf h264_mp4toannexb %s";
-        final String CMD_CUT_TS = "ffmpeg -i %s -c copy -map 0 -f segment -segment_list %s -segment_time 30 %s/%s_%%4d.ts";
+
+        //调取ffmpeg命令
+        final String CMD_TRANSFER_2TS = "ffmpeg -y -i %s  -vcodec copy -acodec copy -vbsf h264_mp4toannexb %s";//将视频文件转为ts文件
+        final String CMD_CUT_TS = "ffmpeg -i %s -c copy -map 0 -f segment -segment_list %s -segment_time 30 %s/%s_%%4d.ts";//切割ts文件
 
         String tsPath = tsFolder + "/" + Constants.TS_NAME;
+
         //生成.ts
         String cmd = String.format(CMD_TRANSFER_2TS, videoFilePath, tsPath);
         ProcessUtils.executeCommand(cmd, false);
+
         //生成索引文件.m3u8 和切片.ts
         cmd = String.format(CMD_CUT_TS, tsPath, tsFolder.getPath() + "/" + Constants.M3U8_NAME, tsFolder.getPath(), fileId);
         ProcessUtils.executeCommand(cmd, false);
+
         //删除index.ts
         new File(tsPath).delete();
     }

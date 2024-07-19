@@ -65,8 +65,11 @@ public interface FileInfoService {
      */
     Integer deleteFileInfoByFileIdAndUserId(String fileId, String userId);
 
+    /**
+     * 文件分片上传
+     */
     UploadResultDto uploadFile(SessionWebUserDto webUserDto, String fileId, MultipartFile file, String fileName, String filePid, String fileMd5, Integer chunkIndex,
-                               Integer chunks);
+                               Integer chunks, Integer fileSize);
 
     FileInfo rename(String fileId, String userId, String fileName);
 

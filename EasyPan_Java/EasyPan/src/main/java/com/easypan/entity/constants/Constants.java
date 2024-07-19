@@ -33,6 +33,7 @@ public class Constants {
 
     public static final String FILE_FOLDER_TEMP = "temp/";
 
+    //TODO 修改常量名称，便于理解
     public static final String IMAGE_PNG_SUFFIX = ".png";
 
     public static final String TS_NAME = "index.ts";

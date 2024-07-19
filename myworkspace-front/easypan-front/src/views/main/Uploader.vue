@@ -259,6 +259,8 @@ const uploadFile = async (uid, chunkIndex) => {
         chunks: chunks,
         fileId: currentFile.fileId,
         filePid: currentFile.filePid,
+        fileSize: currentFile.totalSize,
+        //TODO 前端上传参数更改
       },
       showError: false,
       errorCallback: (errorMsg) => {

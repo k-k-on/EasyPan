@@ -3,6 +3,12 @@ package com.easypan.entity.enums;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+/**
+ * 文件类型枚举类
+ *
+ * @date 2024/7/19 9:57
+ * @author LiMengYuan
+ */
 public enum FileTypeEnums {
     //1:视频 2:音频  3:图片 4:pdf 5:word 6:excel 7:txt 8:code 9:zip 10:其他文件
     VIDEO(FileCategoryEnums.VIDEO, 1, new String[]{".mp4", ".avi", ".rmvb", ".mkv", ".mov"}, "视频"),

@@ -24,6 +24,12 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.util.List;
 
+/**
+ * 通用文件控制类
+ *
+ * @date 2024/7/19 11:45
+ * @author LiMengYuan
+ */
 public class CommonFileController extends ABaseController {
 
     @Resource
@@ -48,24 +54,53 @@ public class CommonFileController extends ABaseController {
         return getSuccessResponseVO(CopyTools.copyList(fileInfoList, FolderVO.class));
     }
 
+    /**
+     * 获取图片
+     *
+     * @date 2024/7/19 11:46
+     * @param response
+     * @param imageFolder
+     * @param imageName
+     * @return
+     * @throws
+     */
     public void getImage(HttpServletResponse response, String imageFolder, String imageName) {
         if (StringTools.isEmpty(imageFolder) || StringUtils.isBlank(imageName)) {
             return;
         }
         String imageSuffix = StringTools.getFileSuffix(imageName);
-        String filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + imageFolder + "/" + imageName;
+        String filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + imageFolder + "/" + imageName;//文件的完整路径
         imageSuffix = imageSuffix.replace(".", "");
         String contentType = "image/" + imageSuffix;
         response.setContentType(contentType);
-        response.setHeader("Cache-Control", "max-age=2592000");
+        response.setHeader("Cache-Control", "max-age=2592000");//设置文件缓存时间
         readFile(response, filePath);
     }
 
+    /**
+     * 获取文件信息
+     *
+     * @date 2024/7/19 15:51
+     * @param response
+     * @param fileId
+     * @param userId
+     * @return
+     * @throws
+     */
     protected void getFile(HttpServletResponse response, String fileId, String userId) {
+        /*文件读取步骤：
+        * 1、判断是否为视频文件（存在m3u8文件和ts文件）
+        * 2、非视频文件：直接读取文件地址
+        * 3、视频文件：读取一个个小的ts文件
+        *   1、先读取m3u8文件（"index.m3u8"）
+        *   2、根据m3u8文件读取一系列ts文件（"*.ts"）
+        * */
         String filePath = null;
+        //判断文件是m3u8文件还是ts文件
         if (fileId.endsWith(".ts")) {
-            String[] tsAarray = fileId.split("_");
-            String realFileId = tsAarray[0];
+            //获取ts文件对应的文件id
+            String[] tsArray = fileId.split("_");
+            String realFileId = tsArray[0];
             //根据原文件的id查询出一个文件集合
             FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(realFileId, userId);
             if (fileInfo == null) {
@@ -87,8 +122,11 @@ public class CommonFileController extends ABaseController {
                     return;
                 }
             }
+            //获取视频文件在file文件夹中的相对路径
             String fileName = fileInfo.getFilePath();
+            //获取ts文件在file文件夹中的相对路径
             fileName = StringTools.getFileNameNoSuffix(fileName) + "/" + fileId;
+            //获取ts文件的完整路径
             filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + fileName;
         } else {
             FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(fileId, userId);
@@ -98,7 +136,9 @@ public class CommonFileController extends ABaseController {
             //视频文件读取.m3u8文件
             if (FileCategoryEnums.VIDEO.getCategory().equals(fileInfo.getFileCategory())) {
                 //重新设置文件路径
+                //获取没有后缀的文件名
                 String fileNameNoSuffix = StringTools.getFileNameNoSuffix(fileInfo.getFilePath());
+                //获取对应的M3U8文件的完整路径
                 filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + fileNameNoSuffix + "/" + Constants.M3U8_NAME;
             } else {
                 filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + fileInfo.getFilePath();

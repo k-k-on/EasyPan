@@ -9,9 +9,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * 运行工具类
+ *
+ * @date 2024/7/19 11:28
+ * @author LiMengYuan
+ */
 public class ProcessUtils {
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
+    /**
+     * 通过JAVA程序执行CMD命令
+     *
+     * @date 2024/7/19 11:27
+     * @param cmd
+     * @param outprintLog
+     * @return String
+     * @throws
+     */
     public static String executeCommand(String cmd, Boolean outprintLog) throws BusinessException {
         if (StringTools.isEmpty(cmd)) {
             logger.error("--- 指令执行失败，因为要执行的FFmpeg指令为空！ ---");

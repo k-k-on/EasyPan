@@ -1,3 +1,5 @@
 node_modules
 .idea
 /web_app/easypan/logs/
+/web_app/easypan/file/202407/
+/web_app/easypan/file/*/
