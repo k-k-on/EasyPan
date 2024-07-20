@@ -162,19 +162,47 @@ public class FileInfoController extends CommonFileController {
         super.getFile(response, fileId, webUserDto.getUserId());
     }
 
-    @RequestMapping("/newFoloder")
+    /**
+     * 接口：/newFolder
+     * <br/>
+     * 请求参数：filePid fileName
+     * <br/>
+     * 新建目录
+     *
+     * @date 2024/7/19 16:44
+     * @param session
+     * @param filePid 文件父id
+     * @param fileName 目录名
+     * @return ResponseVO
+     * @throws
+     */
+    @RequestMapping("/newFolder")
     @GlobalInterceptor(checkParams = true)
-    public ResponseVO newFoloder(HttpSession session,
-                                 @VerifyParam(required = true) String filePid,
-                                 @VerifyParam(required = true) String fileName) {
+    public ResponseVO newFolder(HttpSession session,
+                                @VerifyParam(required = true) String filePid,
+                                @VerifyParam(required = true) String fileName) {
         SessionWebUserDto webUserDto = getUserInfoFromSession(session);
         FileInfo fileInfo = fileInfoService.newFolder(filePid, webUserDto.getUserId(), fileName);
         return getSuccessResponseVO(fileInfo);
     }
 
+    /**
+     * 接口：/getFolderInfo
+     * <br/>
+     * 请求参数：filePid fileName
+     * <br/>
+     * 获取当前目录
+     *
+     * @date 2024/7/19 17:23
+     * @param session
+     * @param path
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/getFolderInfo")
     @GlobalInterceptor(checkParams = true)
-    public ResponseVO getFolderInfo(HttpSession session, @VerifyParam(required = true) String path) {
+    public ResponseVO getFolderInfo(HttpSession session,
+                                    @VerifyParam(required = true) String path) {
         return super.getFolderInfo(path, getUserInfoFromSession(session).getUserId());
     }
 

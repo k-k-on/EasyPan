@@ -203,7 +203,7 @@ const currentFolder = ref({ fileId: 0 });
 const api = {
   loadDataList: "/file/loadDataList",
   rename: "/file/rename",
-  newFoloder: "/file/newFoloder",
+  newFolder: "/file/newFolder",
   getFolderInfo: "/file/getFolderInfo",
   delFile: "/file/delFile",
   changeFileFolder: "/file/changeFileFolder",
@@ -327,7 +327,7 @@ const saveNameEdit = async (index) => {
   }
   let url = api.rename;
   if (fileId == "") {
-    url = api.newFoloder;
+    url = api.newFolder;
   }
   let result = await proxy.Request({
     url: url,

@@ -41,7 +41,15 @@ public class CommonFileController extends ABaseController {
     @Resource
     private RedisComponent redisComponent;
 
-
+    /**
+     * 获取当前目录
+     *
+     * @date 2024/7/19 17:33
+     * @param path
+     * @param userId
+     * @return ResponseVO
+     * @throws
+     */
     public ResponseVO getFolderInfo(String path, String userId) {
         String[] pathArray = path.split("/");
         FileInfoQuery infoQuery = new FileInfoQuery();

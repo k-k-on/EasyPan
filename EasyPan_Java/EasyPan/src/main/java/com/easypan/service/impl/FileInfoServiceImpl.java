@@ -571,6 +571,17 @@ public class FileInfoServiceImpl implements FileInfoService {
         return fileInfo;
     }
 
+    /**
+     * 校验文件夹是否重名
+     *
+     * @date 2024/7/19 16:47
+     * @param filePid
+     * @param userId
+     * @param fileName
+     * @param folderType
+     * @return
+     * @throws BusinessException 此目录下已存在同名文件，请修改名称
+     */
     private void checkFileName(String filePid, String userId, String fileName, Integer folderType) {
         FileInfoQuery fileInfoQuery = new FileInfoQuery();
         fileInfoQuery.setFolderType(folderType);
@@ -584,10 +595,22 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 新建目录
+     *
+     * @date 2024/7/19 16:45
+     * @param filePid
+     * @param userId
+     * @param folderName
+     * @return FileInfo
+     * @throws
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public FileInfo newFolder(String filePid, String userId, String folderName) {
         checkFileName(filePid, userId, folderName, FileFolderTypeEnums.FOLDER.getType());
+
+        //写入数据库文件夹信息
         Date curDate = new Date();
         FileInfo fileInfo = new FileInfo();
         fileInfo.setFileId(StringTools.getRandomString(Constants.LENGTH_10));
