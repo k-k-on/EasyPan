@@ -19,9 +19,7 @@ import com.easypan.utils.StringTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -67,10 +65,11 @@ public class AccountController extends ABaseController {
 
 
     /**
-     * 接口：/checkCode?type=0
+     * 接口：/checkCode?type=0&time=1721453022292 GET
      * <br/>
      * 请求参数：type
      * <br/>
+     * 获取验证码
      *
      * @param response
      * @param session
@@ -98,7 +97,7 @@ public class AccountController extends ABaseController {
 
 
     /**
-     * 接口：/sendEmailCode
+     * 接口：/sendEmailCode POST
      * <br/>
      * 请求参数：<li/>email<li/>checkCode<li/>type
      * <br/>
@@ -111,7 +110,7 @@ public class AccountController extends ABaseController {
      * @return ResponseVO
      * @throws
      */
-    @RequestMapping("/sendEmailCode")
+    @RequestMapping ("/sendEmailCode")
     @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
     public ResponseVO sendEmailCode(HttpSession session,
                                     @VerifyParam(required = true, regex = VerifyRegexEnum.EMAIL, max = 150) String email,
@@ -129,7 +128,7 @@ public class AccountController extends ABaseController {
     }
 
     /**
-     * 接口：/register
+     * 接口：/register POST
      * <br/>
      * 请求参数：email checkCode type
      * <br/>
@@ -230,7 +229,7 @@ public class AccountController extends ABaseController {
     }
 
     /**
-     * 接口：/getAvatar/{userId}
+     * 接口：/getAvatar/{userId}  GET
      * <br/>
      * 请求参数：email password checkCode
      * <br/>
@@ -292,7 +291,7 @@ public class AccountController extends ABaseController {
 
 
     /**
-     * 接口：/getUseSpace
+     * 接口：/getUseSpace POST
      * <br/>
      * 请求参数：
      * <br/>

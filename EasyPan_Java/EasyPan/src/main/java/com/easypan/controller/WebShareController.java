@@ -21,9 +21,7 @@ import com.easypan.service.FileShareService;
 import com.easypan.service.UserInfoService;
 import com.easypan.utils.CopyTools;
 import com.easypan.utils.StringTools;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;

@@ -11,9 +11,7 @@ import com.easypan.entity.vo.ResponseVO;
 import com.easypan.entity.vo.UserInfoVO;
 import com.easypan.service.FileInfoService;
 import com.easypan.service.UserInfoService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
