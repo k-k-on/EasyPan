@@ -20,14 +20,14 @@
         <el-input
           clearable
           placeholder="请输入注册邮件验证码邮件内容%s占位符为验证码内容"
-          v-model="formData.registerEmailContext"
+          v-model="formData.registerEmailContent"
         ></el-input>
       </el-form-item>
       <el-form-item label="初始空间大小" prop="userInitUserSpace">
         <el-input
           clearable
           placeholder="初始空间大小"
-          v-model="formData.userInitUserSpace"
+          v-model="formData.userInitUseSpace"
         >
           <template #suffix>MB</template>
         </el-input>
@@ -65,10 +65,10 @@ const rules = {
   registerEmailTitle: [
     { required: true, message: "请输入注册邮件验证码邮件标题" },
   ],
-  registerEmailContext: [
+  registerEmailContent: [
     { required: true, message: "请输入注册邮件验证码邮件内容" },
   ],
-  userInitUserSpace: [
+  userInitUseSpace: [
     { required: true, message: "请输入初始化空间大小" },
     {
       validator: proxy.Verify.number,

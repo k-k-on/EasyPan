@@ -63,6 +63,9 @@ public class RedisComponent {
         redisUtils.set(Constants.REDIS_KEY_SYS_SETTING, sysSettingsDto);
     }
 
+    /**
+     * 保存下载链接信息到redis
+     */
     public void saveDownloadCode(String code, DownloadFileDto downloadFileDto) {
         redisUtils.setex(Constants.REDIS_KEY_DOWNLOAD + code, downloadFileDto, Constants.REDIS_KEY_EXPIRES_FIVE_MIN);
     }
@@ -105,6 +108,13 @@ public class RedisComponent {
         redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
     }
 
+    /**
+     * 重置用户总空间大小
+     *
+     * @date 2024/7/30 19:46
+     * @param userId
+     * @return UserSpaceDto
+     */
     public UserSpaceDto resetUserSpaceUse(String userId) {
         UserSpaceDto spaceDto = new UserSpaceDto();
         Long useSpace = this.fileInfoMapper.selectUseSpace(userId);

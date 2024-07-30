@@ -535,6 +535,16 @@ public class FileInfoServiceImpl implements FileInfoService {
         new File(tsPath).delete();
     }
 
+    /**
+     * 文件重命名
+     *
+     * @date 2024/7/30 16:07
+     * @param fileId
+     * @param userId
+     * @param fileName
+     * @return FileInfo
+     * @throws BusinessException 文件不存在
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public FileInfo rename(String fileId, String userId, String fileName) {
@@ -547,7 +557,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
         String filePid = fileInfo.getFilePid();
         checkFileName(filePid, userId, fileName, fileInfo.getFolderType());
-        //文件获取后缀
+        //文件获取后缀，不可以修改文件后缀
         if (FileFolderTypeEnums.FILE.getType().equals(fileInfo.getFolderType())) {
             fileName = fileName + StringTools.getFileSuffix(fileInfo.getFileName());
         }
@@ -557,6 +567,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         dbInfo.setLastUpdateTime(curDate);
         this.fileInfoMapper.updateByFileIdAndUserId(dbInfo, fileId, userId);
 
+        //检查重命名后的名称是否重复
         FileInfoQuery fileInfoQuery = new FileInfoQuery();
         fileInfoQuery.setFilePid(filePid);
         fileInfoQuery.setUserId(userId);
@@ -639,11 +650,23 @@ public class FileInfoServiceImpl implements FileInfoService {
         return fileInfo;
     }
 
+    /**
+     * 修改文件目录、移动文件
+     *
+     * @date 2024/7/30 16:28
+     * @param fileIds
+     * @param filePid
+     * @param userId
+     * @return
+     * @throws BusinessException 请求参数错误
+     */
     @Transactional(rollbackFor = Exception.class)
     public void changeFileFolder(String fileIds, String filePid, String userId) {
+        //不能移动到当前目录
         if (fileIds.equals(filePid)) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
+        //不是在根目录下时
         if (!Constants.ZERO_STR.equals(filePid)) {
             FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(filePid, userId);
             if (fileInfo == null || !FileDelFlagEnums.USING.getFlag().equals(fileInfo.getDelFlag())) {
@@ -657,7 +680,9 @@ public class FileInfoServiceImpl implements FileInfoService {
         query.setUserId(userId);
         List<FileInfo> dbFileList = fileInfoService.findListByParam(query);
 
+        //将与移动后重名的文件进行重命名
         Map<String, FileInfo> dbFileNameMap = dbFileList.stream().collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (file1, file2) -> file2));
+
         //查询选中的文件
         query = new FileInfoQuery();
         query.setUserId(userId);
@@ -680,7 +705,7 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeFile2RecycleBatch(String userId, String fileIds) {
+    public void removeFile2RecycleBatch(String userId, String fileIds) {//文件名称中2代表to，4代表for
         String[] fileIdArray = fileIds.split(",");
         FileInfoQuery query = new FileInfoQuery();
         query.setUserId(userId);
@@ -694,6 +719,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         for (FileInfo fileInfo : fileInfoList) {
             findAllSubFolderFileIdList(delFilePidList, userId, fileInfo.getFileId(), FileDelFlagEnums.USING.getFlag());
         }
+        //TODO 回收站时间的问题，如何确定回收站过期时间
         //将目录下的所有文件更新为已删除
         if (!delFilePidList.isEmpty()) {
             FileInfo updateInfo = new FileInfo();
@@ -710,6 +736,17 @@ public class FileInfoServiceImpl implements FileInfoService {
     }
 
 
+    /**
+     * 查找目录下所有的子目录
+     *
+     * @date 2024/7/30 17:00
+     * @param fileIdList
+     * @param userId
+     * @param fileId
+     * @param delFlag
+     * @return
+     * @throws
+     */
     private void findAllSubFolderFileIdList(List<String> fileIdList, String userId, String fileId, Integer delFlag) {
         fileIdList.add(fileId);
         FileInfoQuery query = new FileInfoQuery();
@@ -723,6 +760,15 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 批量恢复文件
+     *
+     * @date 2024/7/30 17:18
+     * @param userId
+     * @param fileIds
+     * @return
+     * @throws
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recoverFileBatch(String userId, String fileIds) {
@@ -749,8 +795,7 @@ public class FileInfoServiceImpl implements FileInfoService {
 
         Map<String, FileInfo> rootFileMap = allRootFileList.stream().collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (file1, file2) -> file2));
 
-        //查询所有所选文件
-        //将目录下的所有删除的文件更新为正常
+        //查询所有所选文件 将目录下的所有删除的文件更新为正常
         if (!delFileSubFolderFileIdList.isEmpty()) {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setDelFlag(FileDelFlagEnums.USING.getFlag());
@@ -777,6 +822,16 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
     }
 
+    /**
+     * 彻底删除文件
+     *
+     * @date 2024/7/30 17:40
+     * @param userId
+     * @param fileIds
+     * @param adminOp
+     * @return
+     * @throws
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delFileBatch(String userId, String fileIds, Boolean adminOp) {
@@ -804,6 +859,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         //删除所选文件
         this.fileInfoMapper.delFileBatch(userId, null, Arrays.asList(fileIdArray), adminOp ? null : FileDelFlagEnums.RECYCLE.getFlag());
 
+        //更新用户存储空间
         Long useSpace = this.fileInfoMapper.selectUseSpace(userId);
         UserInfo userInfo = new UserInfo();
         userInfo.setUseSpace(useSpace);
@@ -814,6 +870,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         userSpaceDto.setUseSpace(useSpace);
         redisComponent.saveUserSpaceUse(userId, userSpaceDto);
 
+        //TODO 删除服务器上文件，判断md5是否存在来确定是否删除（秒传功能）
     }
 
     @Override

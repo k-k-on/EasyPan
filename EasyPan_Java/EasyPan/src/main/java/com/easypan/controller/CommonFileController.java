@@ -56,6 +56,7 @@ public class CommonFileController extends ABaseController {
         infoQuery.setUserId(userId);
         infoQuery.setFolderType(FileFolderTypeEnums.FOLDER.getType());
         infoQuery.setFileIdArray(pathArray);
+        //根据传入文件id的顺序排序
         String orderBy = "field(file_id,\"" + StringUtils.join(pathArray, "\",\"") + "\")";
         infoQuery.setOrderBy(orderBy);
         List<FileInfo> fileInfoList = fileInfoService.findListByParam(infoQuery);
@@ -159,11 +160,21 @@ public class CommonFileController extends ABaseController {
         readFile(response, filePath);
     }
 
+    /**
+     * 创建下载链接
+     *
+     * @date 2024/7/30 16:41
+     * @param fileId
+     * @param userId
+     * @return ResponseVO
+     * @throws BusinessException
+     */
     protected ResponseVO createDownloadUrl(String fileId, String userId) {
         FileInfo fileInfo = fileInfoService.getFileInfoByFileIdAndUserId(fileId, userId);
         if (fileInfo == null) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
+        //请求类型为目录
         if (FileFolderTypeEnums.FOLDER.getType().equals(fileInfo.getFolderType())) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
@@ -178,6 +189,16 @@ public class CommonFileController extends ABaseController {
         return getSuccessResponseVO(code);
     }
 
+    /**
+     * 下载文件
+     *
+     * @date 2024/7/30 16:49
+     * @param request
+     * @param response
+     * @param code
+     * @return
+     * @throws
+     */
     protected void download(HttpServletRequest request, HttpServletResponse response, String code) throws Exception {
         DownloadFileDto downloadFileDto = redisComponent.getDownloadCode(code);
         if (null == downloadFileDto) {

@@ -15,13 +15,33 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+/**
+ * 请求地址：{@code http://localhost:1024/api/share}
+ * <br/>
+ * 文件分享 Controller
+ *
+ * @date 2024/7/30 18:19
+ * @author LiMengYuan
+ */
 @RestController("shareController")
 @RequestMapping("/share")
 public class ShareController extends ABaseController {
     @Resource
     private FileShareService fileShareService;
 
-
+    /**
+     * 接口：/loadShareList POST
+     * <br/>
+     * 请求参数：category filePid fileNameFuzzy pageNo pageSize
+     * <br/>
+     * 获取分享文件列表
+     *
+     * @date 2024/7/30 18:21
+     * @param session
+     * @param query
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/loadShareList")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO loadShareList(HttpSession session, FileShareQuery query) {
@@ -33,6 +53,21 @@ public class ShareController extends ABaseController {
         return getSuccessResponseVO(resultVO);
     }
 
+    /**
+     * 接口：/shareFile POST
+     * <br/>
+     * 请求参数：category filePid fileNameFuzzy pageNo pageSize
+     * <br/>
+     * 分享文件
+     *
+     * @date 2024/7/30 18:25
+     * @param session
+     * @param fileId
+     * @param validType
+     * @param code
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/shareFile")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO shareFile(HttpSession session,
@@ -49,6 +84,19 @@ public class ShareController extends ABaseController {
         return getSuccessResponseVO(share);
     }
 
+    /**
+     * 接口：/cancelShare POST
+     * <br/>
+     * 请求参数：shareIds
+     * <br/>
+     * 取消分享
+     *
+     * @date 2024/7/30 18:31
+     * @param session
+     * @param shareIds
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/cancelShare")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO cancelShare(HttpSession session, @VerifyParam(required = true) String shareIds) {

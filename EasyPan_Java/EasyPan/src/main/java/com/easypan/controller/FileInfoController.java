@@ -204,7 +204,20 @@ public class FileInfoController extends CommonFileController {
         return super.getFolderInfo(path, getUserInfoFromSession(session).getUserId());
     }
 
-
+    /**
+     * 接口：/rename
+     * <br/>
+     * 请求参数：filePid fileName
+     * <br/>
+     * 文件重命名
+     *
+     * @date 2024/7/30 16:07
+     * @param session
+     * @param fileId
+     * @param fileName
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/rename")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO rename(HttpSession session,
@@ -215,9 +228,25 @@ public class FileInfoController extends CommonFileController {
         return getSuccessResponseVO(CopyTools.copy(fileInfo, FileInfoVO.class));
     }
 
+    /**
+     * 接口：/loadAllFolder
+     * <br/>
+     * 请求参数：filePid currentFileIds
+     * <br/>
+     * 获取所有目录
+     *
+     * @date 2024/7/30 16:20
+     * @param session
+     * @param filePid
+     * @param currentFileIds
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/loadAllFolder")
     @GlobalInterceptor(checkParams = true)
-    public ResponseVO loadAllFolder(HttpSession session, @VerifyParam(required = true) String filePid, String currentFileIds) {
+    public ResponseVO loadAllFolder(HttpSession session,
+                                    @VerifyParam(required = true) String filePid,
+                                    String currentFileIds) {
         FileInfoQuery query = new FileInfoQuery();
         query.setUserId(getUserInfoFromSession(session).getUserId());
         query.setFilePid(filePid);
@@ -231,6 +260,20 @@ public class FileInfoController extends CommonFileController {
         return getSuccessResponseVO(CopyTools.copyList(fileInfoList, FileInfoVO.class));
     }
 
+    /**
+     * 接口：/loadAllFolder
+     * <br/>
+     * 请求参数：fileIds filePid
+     * <br/>
+     * 修改文件目录、移动文件
+     *
+     * @date 2024/7/30 16:27
+     * @param session
+     * @param fileIds
+     * @param filePid
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/changeFileFolder")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO changeFileFolder(HttpSession session,
@@ -241,19 +284,60 @@ public class FileInfoController extends CommonFileController {
         return getSuccessResponseVO(null);
     }
 
+    /**
+     * 接口：/createDownloadUrl/{fileId}
+     * <br/>
+     * 请求参数：fileId
+     * <br/>
+     * 创建下载链接
+     *
+     * @date 2024/7/30 16:38
+     * @param session
+     * @param fileId
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/createDownloadUrl/{fileId}")
     @GlobalInterceptor(checkParams = true)
-    public ResponseVO createDownloadUrl(HttpSession session, @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
+    public ResponseVO createDownloadUrl(HttpSession session,
+                                        @PathVariable("fileId") @VerifyParam(required = true) String fileId) {
         return super.createDownloadUrl(fileId, getUserInfoFromSession(session).getUserId());
     }
 
+    /**
+     * 接口：/download/{code}
+     * <br/>
+     * 请求参数：code
+     * <br/>
+     * 下载文件
+     *
+     * @date 2024/7/30 16:49
+     * @param request
+     * @param response
+     * @param code
+     * @return
+     * @throws
+     */
     @RequestMapping("/download/{code}")
     @GlobalInterceptor(checkLogin = false, checkParams = true)
-    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable("code") @VerifyParam(required = true) String code) throws Exception {
+    public void download(HttpServletRequest request, HttpServletResponse response,
+                         @PathVariable("code") @VerifyParam(required = true) String code) throws Exception {
         super.download(request, response, code);
     }
 
-
+    /**
+     * 接口：/delFile
+     * <br/>
+     * 请求参数：code
+     * <br/>
+     * 删除文件
+     *
+     * @date 2024/7/30 16:53
+     * @param session
+     * @param fileIds
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/delFile")
     @GlobalInterceptor(checkParams = true)
     public ResponseVO delFile(HttpSession session, @VerifyParam(required = true) String fileIds) {

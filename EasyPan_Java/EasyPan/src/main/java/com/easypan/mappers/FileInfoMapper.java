@@ -37,6 +37,9 @@ public interface FileInfoMapper<T, P> extends BaseMapper<T, P> {
     void updateFileStatusWithOldStatus(@Param("fileId") String fileId, @Param("userId") String userId, @Param("bean") T t,
                                        @Param("oldStatus") Integer oldStatus);
 
+    /**
+     * 批量更新文件状态为del
+     */
     void updateFileDelFlagBatch(@Param("bean") FileInfo fileInfo,
                                 @Param("userId") String userId,
                                 @Param("filePidList") List<String> filePidList,
@@ -44,6 +47,9 @@ public interface FileInfoMapper<T, P> extends BaseMapper<T, P> {
                                 @Param("oldDelFlag") Integer oldDelFlag);
 
 
+    /**
+     * 彻底删除，删除文件从数据库中
+     */
     void delFileBatch(@Param("userId") String userId,
                       @Param("filePidList") List<String> filePidList,
                       @Param("fileIdList") List<String> fileIdList,

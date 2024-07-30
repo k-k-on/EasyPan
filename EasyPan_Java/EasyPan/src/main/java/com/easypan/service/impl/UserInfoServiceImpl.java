@@ -322,7 +322,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         this.userInfoMapper.updateByEmail(updateInfo, email);
     }
 
-
+    /**
+     * 修改用户状态
+     *
+     * @date 2024/7/30 19:40
+     * @param userId
+     * @param status
+     * @return
+     * @throws
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserStatus(String userId, Integer status) {
@@ -330,6 +338,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfo.setStatus(status);
         if (UserStatusEnum.DISABLE.getStatus().equals(status)) {
             userInfo.setUseSpace(0L);
+            //删除该用户的文件
             fileInfoService.deleteFileByUserId(userId);
         }
         userInfoMapper.updateByUserId(userInfo, userId);

@@ -1,6 +1,11 @@
 package com.easypan.entity.enums;
 
-
+/**
+ * 文件分享相关枚举类
+ *
+ * @date 2024/7/30 18:26
+ * @author LiMengYuan
+ */
 public enum ShareValidTypeEnums {
     DAY_1(0, 1, "1天"),
     DAY_7(1, 7, "7天"),

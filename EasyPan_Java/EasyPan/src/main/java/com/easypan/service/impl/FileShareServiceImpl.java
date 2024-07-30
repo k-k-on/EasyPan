@@ -118,6 +118,13 @@ public class FileShareServiceImpl implements FileShareService {
         return this.fileShareMapper.deleteByShareId(shareId);
     }
 
+    /**
+     * 保存分享信息到数据库中
+     *
+     * @date 2024/7/30 18:27
+     * @param share
+     * @throws
+     */
     @Override
     public void saveShare(FileShare share) {
         ShareValidTypeEnums typeEnum = ShareValidTypeEnums.getByType(share.getValidType());
