@@ -4,6 +4,8 @@ import com.easypan.annotation.GlobalInterceptor;
 import com.easypan.annotation.VerifyParam;
 import com.easypan.component.RedisComponent;
 import com.easypan.entity.dto.SysSettingsDto;
+import com.easypan.entity.po.FileInfo;
+import com.easypan.entity.po.UserInfo;
 import com.easypan.entity.query.FileInfoQuery;
 import com.easypan.entity.query.UserInfoQuery;
 import com.easypan.entity.vo.PaginationResultVO;
@@ -52,7 +54,7 @@ public class AdminController extends CommonFileController {
      */
     @RequestMapping("/getSysSettings")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public ResponseVO getSysSettings() {
+    public ResponseVO<SysSettingsDto> getSysSettings() {
         return getSuccessResponseVO(redisComponent.getSysSettingsDto());
     }
 
@@ -100,7 +102,7 @@ public class AdminController extends CommonFileController {
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public ResponseVO loadUser(UserInfoQuery userInfoQuery) {
         userInfoQuery.setOrderBy("join_time desc");
-        PaginationResultVO resultVO = userInfoService.findListByPage(userInfoQuery);
+        PaginationResultVO<UserInfo> resultVO = userInfoService.findListByPage(userInfoQuery);
         return getSuccessResponseVO(convert2PaginationVO(resultVO, UserInfoVO.class));
     }
 
@@ -161,7 +163,7 @@ public class AdminController extends CommonFileController {
     public ResponseVO loadDataList(FileInfoQuery query) {
         query.setOrderBy("last_update_time desc");
         query.setQueryNickName(true);
-        PaginationResultVO resultVO = fileInfoService.findListByPage(query);
+        PaginationResultVO<FileInfo> resultVO = fileInfoService.findListByPage(query);
         return getSuccessResponseVO(resultVO);
     }
 

@@ -40,7 +40,7 @@
         <!--注册-->
         <div v-if="opType == 0 || opType == 2">
           <el-form-item prop="emailCode">
-            <div class="send-emali-panel">
+            <div class="send-email-panel">
               <el-input
                 size="large"
                 placeholder="请输入邮箱验证码"
@@ -476,7 +476,7 @@ const qqLogin = async () => {
         font-weight: bold;
         margin-bottom: 20px;
       }
-      .send-emali-panel {
+      .send-email-panel {
         display: flex;
         width: 100%;
         justify-content: space-between;

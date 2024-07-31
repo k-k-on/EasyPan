@@ -11,9 +11,9 @@ public enum ResponseCodeEnum {
     CODE_902(902, "分享链接不存在，或者已失效"),
     CODE_903(903, "分享验证失效，请重新验证"),
     CODE_904(904, "网盘空间不足，请扩容");
-    private Integer code;
+    private final Integer code;
 
-    private String msg;
+    private final String msg;
 
     ResponseCodeEnum(Integer code, String msg) {
         this.code = code;

@@ -86,8 +86,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<UserInfo> list = this.findListByParam(param);
-        PaginationResultVO<UserInfo> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
-        return result;
+        return new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
     }
 
     /**
@@ -132,8 +131,8 @@ public class UserInfoServiceImpl implements UserInfoService {
      * 根据UserId修改
      */
     @Override
-    public Integer updateUserInfoByUserId(UserInfo bean, String userId) {
-        return this.userInfoMapper.updateByUserId(bean, userId);
+    public void updateUserInfoByUserId(UserInfo bean, String userId) {
+        this.userInfoMapper.updateByUserId (bean, userId);
     }
 
     /**
@@ -246,11 +245,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         sessionWebUserDto.setUserId(userInfo.getUserId());
 
         //校验是否为超级管理员
-        if (ArrayUtils.contains(appConfig.getAdminEmails().split(","), email)) {
-            sessionWebUserDto.setAdmin(true);
-        } else {
-            sessionWebUserDto.setAdmin(false);
-        }
+        sessionWebUserDto.setAdmin(ArrayUtils.contains (appConfig.getAdminEmails ().split (","), email));
 
         //用户空间
         UserSpaceDto userSpaceDto = new UserSpaceDto();
@@ -261,7 +256,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     /**
-     * 注册，添加到uesr_info
+     * 注册，添加到user_info
      *
      * @param email 邮箱
      * @param nickName 昵称
@@ -361,7 +356,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         //查询该openId有没有对应的用户信息。有：获取信息登录；无：获取信息注册并登录
         UserInfo user = this.userInfoMapper.selectByQqOpenId(openId);
-        String avatar = null;
+        String avatar;
         if (null == user) { //自动注册
             //step 3：获取QQ的用户信息
             QQInfoDto qqInfo = getQQUserInfo(accessToken, openId);
@@ -399,11 +394,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         sessionWebUserDto.setUserId(user.getUserId());
         sessionWebUserDto.setNickName(user.getNickName());
         sessionWebUserDto.setAvatar(avatar);
-        if (ArrayUtils.contains(appConfig.getAdminEmails().split(","), user.getEmail() == null ? "" : user.getEmail())) {
-            sessionWebUserDto.setAdmin(true);
-        } else {
-            sessionWebUserDto.setAdmin(false);
-        }
+        sessionWebUserDto.setAdmin(ArrayUtils.contains (appConfig.getAdminEmails ().split (","), user.getEmail () == null ? "" : user.getEmail ()));
 
         UserSpaceDto userSpaceDto = new UserSpaceDto();
         userSpaceDto.setUseSpace(fileInfoService.getUserUseSpace(user.getUserId()));
@@ -431,14 +422,14 @@ public class UserInfoServiceImpl implements UserInfoService {
             logger.error("encode失败");
         }
         String tokenResult = OKHttpUtils.getRequest(url);
-        if (tokenResult == null || tokenResult.indexOf(Constants.VIEW_OBJ_RESULT_KEY) != -1) {
+        if (tokenResult == null || tokenResult.contains (Constants.VIEW_OBJ_RESULT_KEY)) {
             logger.error("获取qqToken失败:{}", tokenResult);
             throw new BusinessException("获取qqToken失败");
         }
         String[] params = tokenResult.split("&");
-        if (params != null && params.length > 0) {
+        if (params != null) {
             for (String p : params) {
-                if (p.indexOf("access_token") != -1) {
+                if (p.contains ("access_token")) {
                     accessToken = p.split("=")[1];
                     break;
                 }
@@ -503,8 +494,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             if (pos != -1) {
                 int start = result.indexOf("(");
                 int end = result.lastIndexOf(")");
-                String jsonStr = result.substring(start + 1, end - 1);
-                return jsonStr;
+                return result.substring(start + 1, end - 1);
             }
         }
         return null;

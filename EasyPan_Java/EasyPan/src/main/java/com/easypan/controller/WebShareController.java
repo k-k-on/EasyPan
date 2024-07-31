@@ -75,11 +75,7 @@ public class WebShareController extends CommonFileController {
 
         //判断是否是当前用户分享的文件
         SessionWebUserDto userDto = getUserInfoFromSession(session);
-        if (userDto != null && userDto.getUserId().equals(shareSessionDto.getShareUserId())) {
-            shareInfoVO.setCurrentUser(true);
-        } else {
-            shareInfoVO.setCurrentUser(false);
-        }
+        shareInfoVO.setCurrentUser(userDto != null && userDto.getUserId ().equals (shareSessionDto.getShareUserId ()));
         return getSuccessResponseVO(shareInfoVO);
     }
 
@@ -180,7 +176,7 @@ public class WebShareController extends CommonFileController {
         query.setUserId(shareSessionDto.getShareUserId());
         query.setOrderBy("last_update_time desc");
         query.setDelFlag(FileDelFlagEnums.USING.getFlag());
-        PaginationResultVO resultVO = fileInfoService.findListByPage(query);
+        PaginationResultVO<FileInfo> resultVO = fileInfoService.findListByPage(query);
         return getSuccessResponseVO(convert2PaginationVO(resultVO, FileInfoVO.class));
     }
 

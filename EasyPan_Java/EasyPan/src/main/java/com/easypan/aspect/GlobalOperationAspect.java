@@ -42,7 +42,7 @@ import java.util.List;
 @Aspect
 public class GlobalOperationAspect {
 
-    private static Logger logger = LoggerFactory.getLogger(GlobalOperationAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalOperationAspect.class);
     private static final String TYPE_STRING = "java.lang.String";
     private static final String TYPE_INTEGER = "java.lang.Integer";
     private static final String TYPE_LONG = "java.lang.Long";
@@ -98,9 +98,6 @@ public class GlobalOperationAspect {
         } catch (BusinessException e) {
             logger.error("全局拦截器异常", e);
             throw e;
-        } catch (Exception e) {
-            logger.error("全局拦截器异常", e);
-            throw new BusinessException(ResponseCodeEnum.CODE_500);
         } catch (Throwable e) {
             logger.error("全局拦截器异常", e);
             throw new BusinessException(ResponseCodeEnum.CODE_500);
@@ -164,7 +161,7 @@ public class GlobalOperationAspect {
     private void checkObjValue(Parameter parameter, Object value) {
         try {
             String typeName = parameter.getParameterizedType().getTypeName();
-            Class classz = Class.forName(typeName);
+            Class<?> classz = Class.forName(typeName);
             Field[] fields = classz.getDeclaredFields();
             for (Field field : fields) {
                 VerifyParam fieldVerifyParam = field.getAnnotation(VerifyParam.class);
@@ -195,8 +192,8 @@ public class GlobalOperationAspect {
      * @throws BusinessException
      */
     private void checkValue(Object value, VerifyParam verifyParam) throws BusinessException {
-        Boolean isEmpty = value == null || StringTools.isEmpty(value.toString());
-        Integer length = value == null ? 0 : value.toString().length();
+        boolean isEmpty = value == null || StringTools.isEmpty(value.toString());
+        int length = value == null ? 0 : value.toString().length();
 
         /*
          * 校验空

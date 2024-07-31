@@ -1,5 +1,5 @@
 <template>
-  <div v-html="excelContent" class="talbe-info"></div>
+  <div v-html="excelContent" class="table-info"></div>
 </template>
 
 <script setup>
@@ -32,7 +32,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.talbe-info {
+.table-info {
   width: 100%;
   padding: 10px;
   :deep table {

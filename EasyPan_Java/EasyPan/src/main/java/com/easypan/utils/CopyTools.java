@@ -1,5 +1,8 @@
 package com.easypan.utils;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -12,16 +15,19 @@ import java.util.List;
  * @author LiMengYuan
  */
 public class CopyTools {
+    private static final Logger logger = LoggerFactory.getLogger(CopyTools.class);
     public static <T, S> List<T> copyList(List<S> sList, Class<T> classz) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<> ();
         for (S s : sList) {
             T t = null;
             try {
                 t = classz.newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("异常信息:{}", e.getMessage());
             }
-            BeanUtils.copyProperties(s, t);
+            if (t != null) {
+                BeanUtils.copyProperties(s, t);
+            }
             list.add(t);
         }
         return list;
@@ -32,9 +38,11 @@ public class CopyTools {
         try {
             t = classz.newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异常信息:{}", e.getMessage());
         }
-        BeanUtils.copyProperties(s, t);
+        if (t != null) {
+            BeanUtils.copyProperties(s, t);
+        }
         return t;
     }
 }

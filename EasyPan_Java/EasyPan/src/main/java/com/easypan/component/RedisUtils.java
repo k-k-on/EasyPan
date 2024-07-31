@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Reids相关工具
+ * Redis相关工具
  *
  * @date 2024/7/17 17:46
  * @author LiMengYuan

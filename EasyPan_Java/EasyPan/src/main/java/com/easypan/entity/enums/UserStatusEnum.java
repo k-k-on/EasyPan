@@ -7,7 +7,7 @@ public enum UserStatusEnum {
     ENABLE(1, "启用");
 
 
-    private Integer status;
+    private final Integer status;
     private String desc;
 
     UserStatusEnum(Integer status, String desc) {

@@ -52,7 +52,7 @@ public interface UserInfoService {
     /**
      * 根据UserId修改
      */
-    Integer updateUserInfoByUserId(UserInfo bean, String userId);
+    void updateUserInfoByUserId(UserInfo bean, String userId);
 
 
     /**

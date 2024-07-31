@@ -6,8 +6,8 @@ public enum UploadStatusEnums {
     UPLOADING("uploading", "上传中"),
     UPLOAD_FINISH("upload_finish", "上传完成");
 
-    private String code;
-    private String desc;
+    private final String code;
+    private final String desc;
 
     UploadStatusEnums(String code, String desc) {
         this.code = code;

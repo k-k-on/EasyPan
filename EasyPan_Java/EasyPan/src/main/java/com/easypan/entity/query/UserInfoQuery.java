@@ -1,12 +1,10 @@
 package com.easypan.entity.query;
 
-import java.util.Date;
-
 
 /**
- * 
+ *
  * 用户信息参数
- * 
+ *
  */
 public class UserInfoQuery extends BaseParam {
 
@@ -33,14 +31,14 @@ public class UserInfoQuery extends BaseParam {
 	private String emailFuzzy;
 
 	/**
-	 * 
+	 *
 	 */
 	private String qqAvatar;
 
 	private String qqAvatarFuzzy;
 
 	/**
-	 * 
+	 *
 	 */
 	private String qqOpenId;
 
@@ -77,12 +75,12 @@ public class UserInfoQuery extends BaseParam {
 	private Integer status;
 
 	/**
-	 * 
+	 *
 	 */
 	private Long useSpace;
 
 	/**
-	 * 
+	 *
 	 */
 	private Long totalSpace;
 

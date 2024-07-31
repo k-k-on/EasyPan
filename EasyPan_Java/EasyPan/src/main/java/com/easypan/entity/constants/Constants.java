@@ -58,7 +58,7 @@ public class Constants {
 
     public static final String VIEW_OBJ_RESULT_KEY = "result";
 
-    /**
+    /*
      * redis key 相关
      */
 

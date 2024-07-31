@@ -11,8 +11,8 @@ public enum FileStatusEnums {
     TRANSFER_FAIL(1, "转码失败"),
     USING(2, "使用中");
 
-    private Integer status;
-    private String desc;
+    private final Integer status;
+    private final String desc;
 
     FileStatusEnums(Integer status, String desc) {
         this.status = status;
