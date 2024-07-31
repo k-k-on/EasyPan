@@ -873,6 +873,16 @@ public class FileInfoServiceImpl implements FileInfoService {
         //TODO 删除服务器上文件，判断md5是否存在来确定是否删除（秒传功能）
     }
 
+    /**
+     * 校验根目录pid是否正确
+     *
+     * @date 2024/7/31 10:07
+     * @param rootFilePid
+     * @param userId
+     * @param fileId
+     * @return
+     * @throws
+     */
     @Override
     public void checkRootFilePid(String rootFilePid, String userId, String fileId) {
         if (StringTools.isEmpty(fileId)) {
@@ -884,6 +894,16 @@ public class FileInfoServiceImpl implements FileInfoService {
         checkFilePid(rootFilePid, fileId, userId);
     }
 
+    /**
+     * 校验文件的pid
+     *
+     * @date 2024/7/31 10:08
+     * @param rootFilePid
+     * @param fileId
+     * @param userId
+     * @return
+     * @throws
+     */
     private void checkFilePid(String rootFilePid, String fileId, String userId) {
         FileInfo fileInfo = this.fileInfoMapper.selectByFileIdAndUserId(fileId, userId);
         if (fileInfo == null) {
@@ -898,12 +918,24 @@ public class FileInfoServiceImpl implements FileInfoService {
         checkFilePid(rootFilePid, fileInfo.getFilePid(), userId);
     }
 
+    /**
+     * 保存分享到网盘
+     *
+     * @date 2024/7/31 10:30
+     * @param shareRootFilePid
+     * @param shareFileIds
+     * @param myFolderId
+     * @param shareUserId
+     * @param currentUserId
+     * @return
+     * @throws
+     */
     @Override
-    public void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String cureentUserId) {
+    public void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String currentUserId) {
         String[] shareFileIdArray = shareFileIds.split(",");
         //目标目录文件列表
         FileInfoQuery fileInfoQuery = new FileInfoQuery();
-        fileInfoQuery.setUserId(cureentUserId);
+        fileInfoQuery.setUserId(currentUserId);
         fileInfoQuery.setFilePid(myFolderId);
         List<FileInfo> currentFileList = this.fileInfoMapper.selectList(fileInfoQuery);
         Map<String, FileInfo> currentFileMap = currentFileList.stream().collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (file1, file2) -> file2));
@@ -920,12 +952,26 @@ public class FileInfoServiceImpl implements FileInfoService {
             if (haveFile != null) {
                 item.setFileName(StringTools.rename(item.getFileName()));
             }
-            findAllSubFile(copyFileList, item, shareUserId, cureentUserId, curDate, myFolderId);
+            findAllSubFile(copyFileList, item, shareUserId, currentUserId, curDate, myFolderId);
         }
         System.out.println(copyFileList.size());
+        //TODO 校验用户空间大小，是否能够保存
         this.fileInfoMapper.insertBatch(copyFileList);
     }
 
+    /**
+     * 递归查找所有子文件
+     *
+     * @date 2024/7/31 10:44
+     * @param copyFileList
+     * @param fileInfo
+     * @param sourceUserId
+     * @param currentUserId
+     * @param curDate
+     * @param newFilePid
+     * @return
+     * @throws
+     */
     private void findAllSubFile(List<FileInfo> copyFileList, FileInfo fileInfo, String sourceUserId, String currentUserId, Date curDate, String newFilePid) {
         String sourceFileId = fileInfo.getFileId();
         fileInfo.setCreateTime(curDate);

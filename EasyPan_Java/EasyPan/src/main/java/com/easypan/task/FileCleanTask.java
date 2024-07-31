@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 定时清理过期文件
+ *
+ * @date 2024/7/31 10:54
+ * @author LiMengYuan
+ */
 @Component
 public class FileCleanTask {
 

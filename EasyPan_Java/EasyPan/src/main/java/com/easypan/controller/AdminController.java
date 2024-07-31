@@ -255,7 +255,18 @@ public class AdminController extends CommonFileController {
         super.download(request, response, code);
     }
 
-
+    /**
+     * 接口：/delFile POST
+     * <br/>
+     * 请求参数：fileIdAndUserIds
+     * <br/>
+     * 删除文件
+     *
+     * @date 2024/7/31 9:25
+     * @param fileIdAndUserIds
+     * @return ResponseVO
+     * @throws
+     */
     @RequestMapping("/delFile")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public ResponseVO delFile(@VerifyParam(required = true) String fileIdAndUserIds) {

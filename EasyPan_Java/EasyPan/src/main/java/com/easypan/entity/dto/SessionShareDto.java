@@ -2,6 +2,12 @@ package com.easypan.entity.dto;
 
 import java.util.Date;
 
+/**
+ * 外部分享的session类
+ *
+ * @date 2024/7/31 9:47
+ * @author LiMengYuan
+ */
 public class SessionShareDto {
     private String shareId;
     private String shareUserId;

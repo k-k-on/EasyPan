@@ -152,6 +152,15 @@ public class FileShareServiceImpl implements FileShareService {
         }
     }
 
+    /**
+     * 校验分享码
+     *
+     * @date 2024/7/31 9:52
+     * @param shareId
+     * @param code
+     * @return SessionShareDto
+     * @throws
+     */
     @Override
     public SessionShareDto checkShareCode(String shareId, String code) {
         FileShare share = this.fileShareMapper.selectByShareId(shareId);

@@ -73,7 +73,14 @@ public class ABaseController {
         return sessionWebUserDto;
     }
 
-
+    /**
+     * 从session中获取外部分享信息
+     *
+     * @date 2024/7/31 9:48
+     * @param session
+     * @param shareId
+     * @return SessionShareDto
+     */
     protected SessionShareDto getSessionShareFromSession(HttpSession session, String shareId) {
         SessionShareDto sessionShareDto = (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
         return sessionShareDto;
