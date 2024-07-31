@@ -32,7 +32,7 @@ public class ABaseController {
 
     protected static final String STATUS_ERROR = "error";
 
-    protected <T> ResponseVO getSuccessResponseVO(T t) {
+    protected <T> ResponseVO<T> getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
         responseVO.setStatus(STATUS_SUCCESS);
         responseVO.setCode(ResponseCodeEnum.CODE_200.getCode());
@@ -69,8 +69,7 @@ public class ABaseController {
      * @return SessionWebUserDto 用户信息
      */
     protected SessionWebUserDto getUserInfoFromSession(HttpSession session) {
-        SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        return sessionWebUserDto;
+        return (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
     }
 
     /**
@@ -82,8 +81,7 @@ public class ABaseController {
      * @return SessionShareDto
      */
     protected SessionShareDto getSessionShareFromSession(HttpSession session, String shareId) {
-        SessionShareDto sessionShareDto = (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
-        return sessionShareDto;
+        return (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
     }
 
 
@@ -109,7 +107,7 @@ public class ABaseController {
             in = new FileInputStream(file);
             byte[] byteData = new byte[1024];
             out = response.getOutputStream();
-            int len = 0;
+            int len;
             while ((len = in.read(byteData)) != -1) {
                 out.write(byteData, 0, len);
             }

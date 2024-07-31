@@ -18,27 +18,27 @@ public enum FileTypeEnums {
     WORD(FileCategoryEnums.DOC, 5, new String[]{".docx"}, "word"),
     EXCEL(FileCategoryEnums.DOC, 6, new String[]{".xlsx"}, "excel"),
     TXT(FileCategoryEnums.DOC, 7, new String[]{".txt"}, "txt文本"),
-    PROGRAME(FileCategoryEnums.OTHERS, 8, new String[]{".h", ".c", ".hpp", ".hxx", ".cpp", ".cc", ".c++", ".cxx", ".m", ".o", ".s", ".dll", ".cs",
+    PROGRAM (FileCategoryEnums.OTHERS, 8, new String[]{".h", ".c", ".hpp", ".hxx", ".cpp", ".cc", ".c++", ".cxx", ".m", ".o", ".s", ".dll", ".cs",
             ".java", ".class", ".js", ".ts", ".css", ".scss", ".vue", ".jsx", ".sql", ".md", ".json", ".html", ".xml"}, "CODE"),
     ZIP(FileCategoryEnums.OTHERS, 9, new String[]{"rar", ".zip", ".7z", ".cab", ".arj", ".lzh", ".tar", ".gz", ".ace", ".uue", ".bz", ".jar", ".iso",
             ".mpq"}, "压缩包"),
     OTHERS(FileCategoryEnums.OTHERS, 10, new String[]{}, "其他");
 
-    private FileCategoryEnums category;
-    private Integer type;
-    private String[] suffixs;
-    private String desc;
+    private final FileCategoryEnums category;
+    private final Integer type;
+    private final String[] suffixes;
+    private final String desc;
 
-    FileTypeEnums(FileCategoryEnums category, Integer type, String[] suffixs, String desc) {
+    FileTypeEnums(FileCategoryEnums category, Integer type, String[] suffixes, String desc) {
         this.category = category;
         this.type = type;
-        this.suffixs = suffixs;
+        this.suffixes = suffixes;
         this.desc = desc;
     }
 
     public static FileTypeEnums getFileTypeBySuffix(String suffix) {
         for (FileTypeEnums item : FileTypeEnums.values()) {
-            if (ArrayUtils.contains(item.getSuffixs(), suffix)) {
+            if (ArrayUtils.contains(item.getSuffixes (), suffix)) {
                 return item;
             }
         }
@@ -54,8 +54,8 @@ public enum FileTypeEnums {
         return null;
     }
 
-    public String[] getSuffixs() {
-        return suffixs;
+    public String[] getSuffixes() {
+        return suffixes;
     }
 
     public FileCategoryEnums getCategory() {

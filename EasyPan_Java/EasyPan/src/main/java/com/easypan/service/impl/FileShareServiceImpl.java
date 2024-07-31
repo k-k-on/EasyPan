@@ -60,8 +60,7 @@ public class FileShareServiceImpl implements FileShareService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<FileShare> list = this.findListByParam(param);
-        PaginationResultVO<FileShare> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
-        return result;
+        return new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
     }
 
     /**

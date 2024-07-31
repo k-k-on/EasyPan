@@ -46,7 +46,7 @@ const getImage = () => {
   if (props.cover) {
     return proxy.globalInfo.imageUrl + props.cover;
   }
-  let icon = "unknow_icon";
+  let icon = "unknown_icon";
   if (props.iconName) {
     icon = props.iconName;
   } else {

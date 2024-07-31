@@ -5,8 +5,8 @@ public enum FileFolderTypeEnums {
     FILE(0, "文件"),
     FOLDER(1, "目录");
 
-    private Integer type;
-    private String desc;
+    private final Integer type;
+    private final String desc;
 
     FileFolderTypeEnums(Integer type, String desc) {
         this.type = type;

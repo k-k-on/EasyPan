@@ -2,6 +2,8 @@ package com.easypan.utils;
 
 
 import com.easypan.entity.enums.DateTimePatternEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,8 +14,10 @@ import java.util.Map;
 
 public class DateUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+
     private static final Object lockObj = new Object();
-    private static Map<String, ThreadLocal<SimpleDateFormat>> sdfMap = new HashMap<String, ThreadLocal<SimpleDateFormat>>();
+    private static final Map<String, ThreadLocal<SimpleDateFormat>> sdfMap = new HashMap<> ();
 
     private static SimpleDateFormat getSdf(final String pattern) {
         ThreadLocal<SimpleDateFormat> tl = sdfMap.get(pattern);
@@ -21,12 +25,7 @@ public class DateUtil {
             synchronized (lockObj) {
                 tl = sdfMap.get(pattern);
                 if (tl == null) {
-                    tl = new ThreadLocal<SimpleDateFormat>() {
-                        @Override
-                        protected SimpleDateFormat initialValue() {
-                            return new SimpleDateFormat(pattern);
-                        }
-                    };
+                    tl = ThreadLocal.withInitial (() -> new SimpleDateFormat(pattern));
                     sdfMap.put(pattern, tl);
                 }
             }
@@ -43,7 +42,7 @@ public class DateUtil {
         try {
             return getSdf(pattern).parse(dateStr);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("异常信息:{}", e.getMessage());
         }
         return new Date();
     }

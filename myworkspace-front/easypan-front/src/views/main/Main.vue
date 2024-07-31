@@ -353,21 +353,21 @@ const editFileName = (index) => {
   tableData.value.list.forEach((element) => {
     element.showEdit = false;
   });
-  let cureentData = tableData.value.list[index];
-  cureentData.showEdit = true;
+  let currentData = tableData.value.list[index];
+  currentData.showEdit = true;
 
   //编辑文件
-  if (cureentData.folderType == 0) {
-    cureentData.fileNameReal = cureentData.fileName.substring(
+  if (currentData.folderType == 0) {
+    currentData.fileNameReal = currentData.fileName.substring(
       0,
-      cureentData.fileName.indexOf(".")
+      currentData.fileName.indexOf(".")
     );
-    cureentData.fileSuffix = cureentData.fileName.substring(
-      cureentData.fileName.indexOf(".")
+    currentData.fileSuffix = currentData.fileName.substring(
+      currentData.fileName.indexOf(".")
     );
   } else {
-    cureentData.fileNameReal = cureentData.fileName;
-    cureentData.fileSuffix = "";
+    currentData.fileNameReal = currentData.fileName;
+    currentData.fileSuffix = "";
   }
   editing.value = true;
   nextTick(() => {

@@ -100,8 +100,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<FileInfo> list = this.findListByParam(param);
-        PaginationResultVO<FileInfo> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
-        return result;
+        return new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
     }
 
     /**
@@ -378,10 +377,10 @@ public class FileInfoServiceImpl implements FileInfoService {
      */
     @Async
     public void transferFile(String fileId, SessionWebUserDto webUserDto) {
-        Boolean transferSuccess = true;
+        boolean transferSuccess = true;
         String targetFilePath = null;
         String cover = null;
-        FileTypeEnums fileTypeEnum = null;
+        FileTypeEnums fileTypeEnum;
         FileInfo fileInfo = fileInfoMapper.selectByFileIdAndUserId(fileId, webUserDto.getUserId());
         try {
             if (fileInfo == null || !FileStatusEnums.TRANSFER.getStatus().equals(fileInfo.getStatus())) {
@@ -432,7 +431,9 @@ public class FileInfoServiceImpl implements FileInfoService {
             transferSuccess = false;
         } finally {
             FileInfo updateInfo = new FileInfo();
-            updateInfo.setFileSize(new File(targetFilePath).length());
+            if (targetFilePath != null) {
+                updateInfo.setFileSize(new File(targetFilePath).length());
+            }
             updateInfo.setFileCover(cover);
             updateInfo.setStatus(transferSuccess ? FileStatusEnums.USING.getStatus() : FileStatusEnums.TRANSFER_FAIL.getStatus());
             fileInfoMapper.updateFileStatusWithOldStatus(fileId, webUserDto.getUserId(), updateInfo, FileStatusEnums.TRANSFER.getStatus());
@@ -462,20 +463,16 @@ public class FileInfoServiceImpl implements FileInfoService {
             writeFile = new RandomAccessFile(targetFile, "rw");
             byte[] b = new byte[1024 * 10];
             for (int i = 0; i < fileList.length; i++) {
-                int len = -1;
+                int len;
                 //创建读块文件的对象
                 File chunkFile = new File(dirPath + File.separator + i);
-                RandomAccessFile readFile = null;
-                try {
-                    readFile = new RandomAccessFile(chunkFile, "r");
-                    while ((len = readFile.read(b)) != -1) {
-                        writeFile.write(b, 0, len);
+                try (RandomAccessFile readFile = new RandomAccessFile (chunkFile, "r")) {
+                    while ((len = readFile.read (b)) != -1) {
+                        writeFile.write (b, 0, len);
                     }
                 } catch (Exception e) {
-                    logger.error("合并分片失败", e);
-                    throw new BusinessException("合并文件失败");
-                } finally {
-                    readFile.close();
+                    logger.error ("合并分片失败", e);
+                    throw new BusinessException ("合并文件失败");
                 }
             }
         } catch (Exception e) {
@@ -494,7 +491,7 @@ public class FileInfoServiceImpl implements FileInfoService {
                     try {
                         FileUtils.deleteDirectory(dir);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("异常信息:{}", e.getMessage());
                     }
                 }
             }

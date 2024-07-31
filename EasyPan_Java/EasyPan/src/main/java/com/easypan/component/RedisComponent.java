@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * Reids相关组件
+ * Redis相关组件
  *
  * @date 2024/7/17 17:51
  * @author LiMengYuan
@@ -111,11 +111,10 @@ public class RedisComponent {
     /**
      * 重置用户总空间大小
      *
-     * @date 2024/7/30 19:46
      * @param userId
-     * @return UserSpaceDto
+     * @date 2024/7/30 19:46
      */
-    public UserSpaceDto resetUserSpaceUse(String userId) {
+    public void resetUserSpaceUse(String userId) {
         UserSpaceDto spaceDto = new UserSpaceDto();
         Long useSpace = this.fileInfoMapper.selectUseSpace(userId);
         spaceDto.setUseSpace(useSpace);
@@ -123,7 +122,6 @@ public class RedisComponent {
         UserInfo userInfo = this.userInfoMapper.selectByUserId(userId);
         spaceDto.setTotalSpace(userInfo.getTotalSpace());
         redisUtils.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, spaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
-        return spaceDto;
     }
 
     /**
@@ -152,8 +150,7 @@ public class RedisComponent {
      * @throws
      */
     public Long getFileTempSize(String userId, String fileId) {
-        Long currentSize = getFileSizeFromRedis(Constants.REDIS_KEY_USER_FILE_TEMP_SIZE + userId + fileId);
-        return currentSize;
+        return getFileSizeFromRedis(Constants.REDIS_KEY_USER_FILE_TEMP_SIZE + userId + fileId);
     }
 
     /**

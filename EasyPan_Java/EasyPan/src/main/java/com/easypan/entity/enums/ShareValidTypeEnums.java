@@ -12,9 +12,9 @@ public enum ShareValidTypeEnums {
     DAY_30(2, 30, "30天"),
     FOREVER(3, -1, "永久有效");
 
-    private Integer type;
-    private Integer days;
-    private String desc;
+    private final Integer type;
+    private final Integer days;
+    private final String desc;
 
     ShareValidTypeEnums(Integer type, Integer days, String desc) {
         this.type = type;

@@ -179,7 +179,7 @@ public class AccountController extends ABaseController {
      */
     @RequestMapping("/login")
     @GlobalInterceptor(checkLogin = false, checkParams = true)//未登录，有传递参数
-    public ResponseVO login(HttpSession session, HttpServletRequest request,
+    public ResponseVO<SessionWebUserDto> login(HttpSession session, HttpServletRequest request,
                             @VerifyParam(required = true) String email,
                             @VerifyParam(required = true) String password,
                             @VerifyParam(required = true) String checkCode) {
@@ -277,15 +277,10 @@ public class AccountController extends ABaseController {
     private void printNoDefaultImage(HttpServletResponse response) {
         response.setHeader(CONTENT_TYPE, CONTENT_TYPE_VALUE);
         response.setStatus(HttpStatus.OK.value());
-        PrintWriter writer = null;
-        try {
-            writer = response.getWriter();
-            writer.print("请在头像目录下放置默认头像default_avatar.jpg");
-            writer.close();
+        try (PrintWriter writer = response.getWriter ()) {
+            writer.print ("请在头像目录下放置默认头像default_avatar.jpg");
         } catch (Exception e) {
-            logger.error("输出无默认图失败", e);
-        } finally {
-            writer.close();
+            logger.error ("输出无默认图失败", e);
         }
     }
 

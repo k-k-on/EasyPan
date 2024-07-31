@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -104,7 +105,7 @@ public class CommonFileController extends ABaseController {
         *   1、先读取m3u8文件（"index.m3u8"）
         *   2、根据m3u8文件读取一系列ts文件（"*.ts"）
         * */
-        String filePath = null;
+        String filePath;
         //判断文件是m3u8文件还是ts文件
         if (fileId.endsWith(".ts")) {
             //获取ts文件对应的文件id
@@ -210,7 +211,7 @@ public class CommonFileController extends ABaseController {
         if (request.getHeader("User-Agent").toLowerCase().indexOf("msie") > 0) {//IE浏览器
             fileName = URLEncoder.encode(fileName, "UTF-8");
         } else {
-            fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
+            fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
         }
         response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
         readFile(response, filePath);

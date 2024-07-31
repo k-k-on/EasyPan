@@ -5,12 +5,12 @@ import com.easypan.annotation.VerifyParam;
 import com.easypan.entity.dto.SessionWebUserDto;
 import com.easypan.entity.enums.FileDelFlagEnums;
 
+import com.easypan.entity.po.FileInfo;
 import com.easypan.entity.query.FileInfoQuery;
 import com.easypan.entity.vo.FileInfoVO;
 import com.easypan.entity.vo.PaginationResultVO;
 import com.easypan.entity.vo.ResponseVO;
 import com.easypan.service.FileInfoService;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,7 +55,7 @@ public class RecycleController extends ABaseController {
         query.setUserId(getUserInfoFromSession(session).getUserId());
         query.setOrderBy("recovery_time desc");
         query.setDelFlag(FileDelFlagEnums.RECYCLE.getFlag());
-        PaginationResultVO result = fileInfoService.findListByPage(query);
+        PaginationResultVO<FileInfo> result = fileInfoService.findListByPage(query);
         return getSuccessResponseVO(convert2PaginationVO(result, FileInfoVO.class));
     }
 

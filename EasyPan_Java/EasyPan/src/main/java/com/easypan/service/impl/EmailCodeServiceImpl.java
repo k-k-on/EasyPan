@@ -82,8 +82,7 @@ public class EmailCodeServiceImpl implements EmailCodeService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<EmailCode> list = this.findListByParam(param);
-        PaginationResultVO<EmailCode> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
-        return result;
+        return new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
     }
 
     /**
@@ -188,7 +187,7 @@ public class EmailCodeServiceImpl implements EmailCodeService {
     @Transactional(rollbackFor = Exception.class)
     public void sendEmailCode(String toEmail, Integer type) {
         //如果是注册，校验邮箱是否已存在
-        if (type == Constants.ZERO) {
+        if (type.equals (Constants.ZERO)) {
             UserInfo userInfo = userInfoMapper.selectByEmail(toEmail);
             if (null != userInfo) {
                 throw new BusinessException("邮箱已经存在");

@@ -9,7 +9,6 @@ import com.easypan.entity.vo.PaginationResultVO;
 import com.easypan.entity.vo.ResponseVO;
 import com.easypan.service.FileShareService;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -49,7 +48,7 @@ public class ShareController extends ABaseController {
         SessionWebUserDto userDto = getUserInfoFromSession(session);
         query.setUserId(userDto.getUserId());
         query.setQueryFileName(true);
-        PaginationResultVO resultVO = this.fileShareService.findListByPage(query);
+        PaginationResultVO<FileShare> resultVO = this.fileShareService.findListByPage(query);
         return getSuccessResponseVO(resultVO);
     }
 

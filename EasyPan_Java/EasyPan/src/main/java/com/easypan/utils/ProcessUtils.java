@@ -21,16 +21,15 @@ public class ProcessUtils {
     /**
      * 通过JAVA程序执行CMD命令
      *
-     * @date 2024/7/19 11:27
      * @param cmd
      * @param outprintLog
-     * @return String
      * @throws
+     * @date 2024/7/19 11:27
      */
-    public static String executeCommand(String cmd, Boolean outprintLog) throws BusinessException {
+    public static void executeCommand(String cmd, Boolean outprintLog) throws BusinessException {
         if (StringTools.isEmpty(cmd)) {
             logger.error("--- 指令执行失败，因为要执行的FFmpeg指令为空！ ---");
-            return null;
+            return;
         }
 
         Runtime runtime = Runtime.getRuntime();
@@ -39,7 +38,7 @@ public class ProcessUtils {
             process = Runtime.getRuntime().exec(cmd);
             // 执行ffmpeg指令
             // 取出输出流和错误流的信息
-            // 注意：必须要取出ffmpeg在执行命令过程中产生的输出信息，如果不取的话当输出流信息填满jvm存储输出留信息的缓冲区时，线程就回阻塞住
+            // 注意：必须 要取出ffmpeg在执行命令过程中产生的输出信息，如果不取的话当输出流信息填满jvm存储输出留信息的缓冲区时，线程就回阻塞住
             PrintStream errorStream = new PrintStream(process.getErrorStream());
             PrintStream inputStream = new PrintStream(process.getInputStream());
             errorStream.start();
@@ -47,7 +46,7 @@ public class ProcessUtils {
             // 等待ffmpeg命令执行完
             process.waitFor();
             // 获取执行结果字符串
-            String result = errorStream.stringBuffer.append(inputStream.stringBuffer + "\n").toString();
+            String result = errorStream.stringBuffer.append (inputStream.stringBuffer).append ("\n").toString();
             // 输出执行的命令信息
 
             if (outprintLog) {
@@ -55,10 +54,9 @@ public class ProcessUtils {
             } else {
                 logger.info("执行命令:{}，已执行完毕", cmd);
             }
-            return result;
         } catch (Exception e) {
-            // logger.error("执行命令失败:{} ", e.getMessage());
-            e.printStackTrace();
+            logger.error("执行命令失败:{} ", e.getMessage());
+            //e.printStackTrace();
             throw new BusinessException("视频转换失败");
         } finally {
             if (null != process) {
@@ -72,7 +70,7 @@ public class ProcessUtils {
      * 在程序退出前结束已有的FFmpeg进程
      */
     private static class ProcessKiller extends Thread {
-        private Process process;
+        private final Process process;
 
         public ProcessKiller(Process process) {
             this.process = process;
@@ -89,9 +87,9 @@ public class ProcessUtils {
      * 用于取出ffmpeg线程执行过程中产生的各种输出和错误流的信息
      */
     static class PrintStream extends Thread {
-        InputStream inputStream = null;
+        final InputStream inputStream;
         BufferedReader bufferedReader = null;
-        StringBuffer stringBuffer = new StringBuffer();
+        final StringBuffer stringBuffer = new StringBuffer();
 
         public PrintStream(InputStream inputStream) {
             this.inputStream = inputStream;
@@ -104,7 +102,7 @@ public class ProcessUtils {
                     return;
                 }
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                String line = null;
+                String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     stringBuffer.append(line);
                 }

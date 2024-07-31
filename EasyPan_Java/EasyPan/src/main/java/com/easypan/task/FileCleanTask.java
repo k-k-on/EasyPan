@@ -32,7 +32,7 @@ public class FileCleanTask {
         List<FileInfo> fileInfoList = fileInfoService.findListByParam(fileInfoQuery);
         Map<String, List<FileInfo>> fileInfoMap = fileInfoList.stream().collect(Collectors.groupingBy(FileInfo::getUserId));
         for (Map.Entry<String, List<FileInfo>> entry : fileInfoMap.entrySet()) {
-            List<String> fileIds = entry.getValue().stream().map(p -> p.getFileId()).collect(Collectors.toList());
+            List<String> fileIds = entry.getValue().stream().map(FileInfo::getFileId).collect(Collectors.toList());
             fileInfoService.delFileBatch(entry.getKey(), String.join(",", fileIds), false);
         }
     }
